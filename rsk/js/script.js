@@ -305,8 +305,8 @@ function resetForm() {
         document.getElementById('placeOfSupply').value = '';
 
         // Reset calculation fields
-        document.getElementById('cgstRate').value = '2.5';
-        document.getElementById('sgstRate').value = '2.5';
+        document.getElementById('cgstRate').value = '9';
+        document.getElementById('sgstRate').value = '9';
         document.getElementById('igstRate').value = '0';
 
         // Add one empty row
