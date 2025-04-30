@@ -46,6 +46,7 @@ body {
         transform: scale(1.5);
     }
 }
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -174,7 +175,8 @@ body {
 /* Alternative styling to match your existing buttons */
 #logoutBtn {
     padding: 10px 20px;
-    background-color: orangered; /* Slightly different red */
+    background-color: orangered;
+    /* Slightly different red */
     color: white;
     border: none;
     border-radius: 4px;
@@ -191,7 +193,8 @@ body {
 /* If you want it to appear in the button group */
 .button-group {
     display: flex;
-    gap: 10px; /* Adds space between buttons */
+    gap: 10px;
+    /* Adds space between buttons */
     flex-wrap: wrap;
 }
 
@@ -579,32 +582,140 @@ body {
     }
 }
 
-/* Print Styles */
+/* Reset and page setup for print */
+@page {
+    size: A4;
+    margin: 0;
+}
+
 @media print {
+    html, body {
+        width: 210mm;  /* A4 width */
+        height: 297mm; /* A4 height */
+        margin: 0;
+        padding: 0;
+    }
+    
     body {
         background-color: white;
-        padding: 0;
     }
-
+    
+    /* Hide controls for printing */
     .controls {
-        display: none;
+        display: none !important;
     }
-
-    .invoice-container {
-        box-shadow: none;
+    
+    /* Center the invoice container */
+    .container {
+        width: 210mm;
+        margin: 0 auto;
         padding: 0;
     }
-
+    
+    /* Make invoice fit on A4 */
+    .invoice-container {
+        width: 190mm;
+        max-width: 190mm;
+        padding: 10mm;
+        margin: 0 auto;
+        box-shadow: none;
+        box-sizing: border-box;
+        font-size: 10pt;
+    }
+    
+    /* Adjust table layout for printing */
+    #productTable {
+        width: 100%;
+        table-layout: fixed;
+        font-size: 9pt;
+    }
+    
+    #productTable th, #productTable td {
+        padding: 4px;
+        white-space: normal;
+        overflow: hidden;
+    }
+    
     #productTable input {
         border: none;
         background-color: transparent;
+        padding: 2px;
     }
-
-    button {
+    
+    /* Adjust column widths */
+    #productTable th:nth-child(1), #productTable td:nth-child(1) { width: 5%; }  /* S.No. */
+    #productTable th:nth-child(2), #productTable td:nth-child(2) { width: 25%; } /* Description */
+    #productTable th:nth-child(3), #productTable td:nth-child(3) { width: 10%; } /* HSN */
+    #productTable th:nth-child(4), #productTable td:nth-child(4) { width: 10%; } /* Qty */
+    #productTable th:nth-child(5), #productTable td:nth-child(5) { width: 10%; } /* Rate */
+    #productTable th:nth-child(6), #productTable td:nth-child(6) { width: 15%; } /* Amount */
+    #productTable th:nth-child(7), #productTable td:nth-child(7) { width: 15%; } /* Taxable */
+    #productTable th:nth-child(8), #productTable td:nth-child(8) { width: 10%; display: none; } /* Action (hidden) */
+    
+    /* Smaller text for calculation section */
+    .calculation-section {
+        font-size: 9pt;
+    }
+    
+    /* Hide buttons on print */
+    button, .remove-row, #addRow {
         display: none !important;
+    }
+    
+    /* More compact layout for header */
+    .invoice-header {
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+    }
+    
+    .company-details h2 {
+        font-size: 16pt;
+        margin-bottom: 5px;
+    }
+    
+    .company-details p {
+        font-size: 9pt;
+        margin-bottom: 2px;
+        line-height: 1.2;
+    }
+    
+    .invoice-title h2 {
+        font-size: 16pt;
+        margin-bottom: 8px;
+    }
+    
+    /* More compact billing info */
+    .billing-info {
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+    }
+    
+    .form-group {
+        margin-bottom: 8px;
+    }
+    
+    .form-group label {
+        width: 100px;
+        font-size: 9pt;
+    }
+    
+    .form-group input, .form-group select {
+        padding: 2px 5px;
+        font-size: 9pt;
+    }
+    
+    /* Compact calculation section */
+    .tax-row {
+        margin-bottom: 6px;
+        padding-bottom: 4px;
+    }
+    
+    .bank-details {
+        padding: 10px;
     }
 }
 
+/* Screen Styles - keep your existing regular CSS here */
 .footer {
     background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
     color: #ffffff;
@@ -832,28 +943,28 @@ body {
     .footer-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .footer-section {
         text-align: center;
     }
-    
+
     .social-links {
         justify-content: center;
     }
-    
+
     .footer-section h3::after {
         left: 50%;
         transform: translateX(-50%);
     }
-    
+
     .footer-section.links a:hover {
         transform: none;
     }
-    
+
     .contact-info p {
         justify-content: center;
     }
-    
+
     .footer-bottom-content {
         flex-direction: column;
     }
@@ -861,12 +972,20 @@ body {
 
 /* Animation */
 @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-5px); }
-    100% { transform: translateY(0px); }
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
 }
 
-.social-links a:hover, 
+.social-links a:hover,
 .developer-links a:hover {
     animation: float 1s ease infinite;
 }
@@ -883,4 +1002,18 @@ body {
 
 .view-history-btn:hover {
     background-color: #0b6dbe;
+}
+
+.dashboard {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: rgb(195, 184, 30);
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+.dashboard:hover {
+    background-color: rgb(172, 172, 13);
 }

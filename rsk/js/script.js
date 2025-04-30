@@ -1,5 +1,5 @@
 // Logout functionality
-document.getElementById('logoutBtn').addEventListener('click', function() {
+document.getElementById('logoutBtn').addEventListener('click', function () {
     sessionStorage.removeItem('isLoggedIn');
     window.location.href = 'login.html';
 });
@@ -15,22 +15,25 @@ const STORE_NAME = 'invoices';
 function initDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
-        
-        request.onupgradeneeded = function(event) {
+
+        request.onupgradeneeded = function (event) {
             const db = event.target.result;
             if (!db.objectStoreNames.contains(STORE_NAME)) {
                 const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
                 store.createIndex('invoiceNo', 'invoiceNo', { unique: true });
                 store.createIndex('customerName', 'customerName', { unique: false });
                 store.createIndex('date', 'date', { unique: false });
+                // Add new indexes for the new fields
+                store.createIndex('paidAmount', 'paidAmount', { unique: false });
+                store.createIndex('status', 'status', { unique: false });
             }
         };
-        
-        request.onsuccess = function(event) {
+
+        request.onsuccess = function (event) {
             resolve(event.target.result);
         };
-        
-        request.onerror = function(event) {
+
+        request.onerror = function (event) {
             reject('Database error: ' + event.target.errorCode);
         };
     });
@@ -42,14 +45,14 @@ async function saveInvoiceToDB(invoiceData) {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORE_NAME], 'readwrite');
         const store = transaction.objectStore(STORE_NAME);
-        
+
         const request = store.add(invoiceData);
-        
-        request.onsuccess = function() {
+
+        request.onsuccess = function () {
             resolve(request.result);
         };
-        
-        request.onerror = function(event) {
+
+        request.onerror = function (event) {
             reject('Error saving invoice: ' + event.target.errorCode);
         };
     });
@@ -61,14 +64,14 @@ async function getAllInvoices() {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORE_NAME], 'readonly');
         const store = transaction.objectStore(STORE_NAME);
-        
+
         const request = store.getAll();
-        
-        request.onsuccess = function() {
+
+        request.onsuccess = function () {
             resolve(request.result);
         };
-        
-        request.onerror = function(event) {
+
+        request.onerror = function (event) {
             reject('Error getting invoices: ' + event.target.errorCode);
         };
     });
@@ -81,14 +84,14 @@ async function searchInvoices(query) {
         const transaction = db.transaction([STORE_NAME], 'readonly');
         const store = transaction.objectStore(STORE_NAME);
         const index = store.index('customerName');
-        
+
         const request = index.getAll(query);
-        
-        request.onsuccess = function() {
+
+        request.onsuccess = function () {
             resolve(request.result);
         };
-        
-        request.onerror = function(event) {
+
+        request.onerror = function (event) {
             reject('Error searching invoices: ' + event.target.errorCode);
         };
     });
@@ -100,14 +103,14 @@ async function deleteInvoice(id) {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORE_NAME], 'readwrite');
         const store = transaction.objectStore(STORE_NAME);
-        
+
         const request = store.delete(id);
-        
-        request.onsuccess = function() {
+
+        request.onsuccess = function () {
             resolve(true);
         };
-        
-        request.onerror = function(event) {
+
+        request.onerror = function (event) {
             reject('Error deleting invoice: ' + event.target.errorCode);
         };
     });
@@ -120,11 +123,11 @@ async function getLastInvoiceNo() {
         const transaction = db.transaction([STORE_NAME], 'readonly');
         const store = transaction.objectStore(STORE_NAME);
         const index = store.index('invoiceNo');
-        
+
         const request = index.openCursor(null, 'prev');
         let lastInvoiceNo = '001'; // Default
-        
-        request.onsuccess = function(event) {
+
+        request.onsuccess = function (event) {
             const cursor = event.target.result;
             if (cursor) {
                 lastInvoiceNo = cursor.value.invoiceNo;
@@ -133,8 +136,8 @@ async function getLastInvoiceNo() {
                 resolve(lastInvoiceNo);
             }
         };
-        
-        request.onerror = function(event) {
+
+        request.onerror = function (event) {
             reject('Error getting last invoice: ' + event.target.errorCode);
         };
     });
@@ -305,8 +308,8 @@ function resetForm() {
         document.getElementById('placeOfSupply').value = '';
 
         // Reset calculation fields
-        document.getElementById('cgstRate').value = '9';
-        document.getElementById('sgstRate').value = '9';
+        document.getElementById('cgstRate').value = '2.5';
+        document.getElementById('sgstRate').value = '2.5';
         document.getElementById('igstRate').value = '0';
 
         // Add one empty row
@@ -383,6 +386,7 @@ function numberToWords(num) {
     const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
         'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
     const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
     if (num === 0) return 'zero';
 
     function convertLessThanOneThousand(num) {
@@ -421,7 +425,8 @@ function numberToWords(num) {
 }
 
 // Logout functionality
-document.getElementById('logoutBtn').addEventListener('click', function() {
+document.getElementById('logoutBtn').addEventListener('click', function () {
     sessionStorage.removeItem('isLoggedIn');
     window.location.href = 'login.html';
 });
+
