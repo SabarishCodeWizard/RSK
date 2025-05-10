@@ -122,7 +122,7 @@ async function getLastInvoiceNo() {
         const index = store.index('invoiceNo');
         
         const request = index.openCursor(null, 'prev');
-        let lastInvoiceNo = '001'; // Default
+        let lastInvoiceNo = '000'; // Default
         
         request.onsuccess = function(event) {
             const cursor = event.target.result;
