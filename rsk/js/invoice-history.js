@@ -35,27 +35,24 @@ function initDB() {
 }
 
 // Function to save invoice to database
-function saveInvoiceToDB() {
+async function saveInvoiceToDB(invoiceData) {
+    const db = await initDB();
     return new Promise((resolve, reject) => {
-        if (!db) {
-            reject('Database not initialized');
-            return;
-        }
+        const transaction = db.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
 
-        const transaction = db.transaction(['invoices'], 'readwrite');
-        const invoiceStore = transaction.objectStore('invoices');
+        // Add default values for new fields if not provided
+        invoiceData.paidAmount = invoiceData.paidAmount || 0;
+        invoiceData.status = invoiceData.status || 'pending';
 
-        const invoiceData = getInvoiceData();
-
-        const request = invoiceStore.put(invoiceData);
+        const request = store.add(invoiceData);
 
         request.onsuccess = function () {
-            resolve();
+            resolve(request.result);
         };
 
         request.onerror = function (event) {
-            console.error('Error saving invoice:', event.target.error);
-            reject('Error saving invoice');
+            reject('Error saving invoice: ' + event.target.errorCode);
         };
     });
 }
