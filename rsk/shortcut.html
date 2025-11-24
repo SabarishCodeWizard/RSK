@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Shortcuts - RSK ENTERPRISES</title>
+    <link rel="stylesheet" href="css/product-shortcut.css">
+    <script>
+        if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="controls">
+            <h1 class="bill-system-header">
+                <a href="#" class="brand-name">Sabarish</a>
+                <span class="system-name">Accounting Software</span>
+            </h1>
+            <a href="index.html" class="dashboard">
+                <i class="fas fa-file-invoice"></i> New BILL
+            </a>
+            <a href="invoice-history.html" class="view-history-btn">
+                <i class="fas fa-history"></i> View Invoice History
+            </a>
+            <a href="customer-details.html" class="view-history-btn">
+                <i class="fas fa-users"></i> Customer Details
+            </a>
+            <a href="shortcut.html" class="view-history-btn active">
+                <i class="fas fa-bolt"></i> Product Shortcuts
+            </a>
+            <a href="recycle-bin.html" class="view-history-btn">
+                <i class="fas fa-trash-restore"></i> Recycle Bin
+            </a>
+            <button id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+
+        <div class="content">
+            <h2>Product Shortcuts</h2>
+            
+            <div class="shortcut-form">
+                <h3>Add New Shortcut</h3>
+                <form id="shortcutForm">
+                    <div class="form-group">
+                        <label for="shortcut">Shortcut *</label>
+                        <input type="text" id="shortcut" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Product Description *</label>
+                        <input type="text" id="description" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Add Shortcut</button>
+                </form>
+            </div>
+            
+            <div class="shortcuts-list">
+                <h3>Existing Shortcuts</h3>
+                <div id="shortcutsContainer">
+                    <!-- Shortcuts will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/db.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/product-shortcut.js"></script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+/* styles.css */
+
+/* --- GENERAL STYLES AND VARIABLES (Must be consistent across all pages) --- */
+:root {
+    --primary-color: #007bff; /* Blue for primary actions/branding */
+    --secondary-color: #6c757d; /* Gray for secondary elements */
+    --success-color: #28a745; /* Green for success/save */
+    --danger-color: #dc3545; /* Red for delete/danger */
+    --warning-color: #ffc107; /* Yellow for restore/warning */
+    --bg-light: #f8f9fa; /* Very light gray background */
+    --bg-white: #ffffff; /* White for content areas */
+    --text-dark: #343a40; /* Dark text */
+    --border-light: #dee2e6; /* Light border color */
+    --shadow-light: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+/* --- LAYOUT CONTAINER --- */
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- SIDEBAR (Controls) - Reused from previous pages --- */
+.controls {
+    width: 250px;
+    background-color: var(--text-dark);
+    color: var(--bg-white);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+}
+
+.bill-system-header {
+    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+    text-align: center;
+}
+
+.brand-name {
+    display: block;
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-decoration: none;
+    margin-bottom: 5px;
+}
+
+.system-name {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--secondary-color);
+    letter-spacing: 1px;
+}
+
+/* Sidebar Links/Buttons */
+.dashboard,
+.view-history-btn,
+#logoutBtn {
+    display: block;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: var(--bg-white);
+    background-color: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.dashboard i,
+.view-history-btn i,
+#logoutBtn i {
+    margin-right: 10px;
+}
+
+.dashboard:hover,
+.view-history-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--primary-color);
+}
+
+.view-history-btn.active {
+    background-color: var(--primary-color);
+    font-weight: 600;
+    color: var(--bg-white);
+}
+
+#logoutBtn {
+    margin-top: auto;
+    background-color: var(--danger-color);
+    color: var(--bg-white);
+}
+
+#logoutBtn:hover {
+    background-color: #c82333;
+}
+
+/* --- MAIN CONTENT AREA --- */
+.content {
+    flex-grow: 1;
+    padding: 30px;
+    background-color: var(--bg-white);
+}
+
+.content h2 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border-light);
+    padding-bottom: 10px;
+}
+
+/* --- RECYCLE ACTIONS (Empty Bin Button) --- */
+.recycle-actions {
+    display: flex;
+    justify-content: flex-end; /* Align to the right */
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+#emptyBin {
+    padding: 10px 20px;
+    background-color: var(--danger-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+    font-weight: 600;
+}
+
+#emptyBin:hover {
+    background-color: #c82333;
+}
+
+/* --- DELETED INVOICE LIST & CARDS --- */
+.deleted-invoices {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.deleted-invoice-card {
+    background-color: var(--bg-light); /* Lighter background to distinguish from main history */
+    border: 1px solid var(--danger-color); /* Red border for emphasis */
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: var(--shadow-light);
+    transition: transform 0.2s;
+    opacity: 0.9;
+}
+
+.deleted-invoice-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    opacity: 1;
+}
+
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px dashed var(--danger-color);
+    padding-bottom: 10px;
+}
+
+.invoice-header h3 {
+    color: var(--danger-color);
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+.invoice-date {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    font-weight: 500;
+}
+
+.invoice-details p {
+    margin: 5px 0;
+    font-size: 0.95rem;
+}
+
+.invoice-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+/* Action Buttons */
+.btn-restore, .btn-delete {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background-color 0.2s;
+    font-weight: 500;
+}
+
+.btn-restore {
+    background-color: var(--warning-color);
+    color: var(--text-dark);
+}
+.btn-restore:hover { 
+    background-color: #e0a800; 
+    color: var(--bg-white); 
+}
+
+/* Delete permanently button */
+.btn-delete {
+    background-color: var(--danger-color);
+    color: white;
+}
+.btn-delete:hover { 
+    background-color: #c82333; 
+}
+
+/* Empty Bin Message */
+.deleted-invoices > p {
+    grid-column: 1 / -1; 
+    text-align: center;
+    color: var(--secondary-color);
+    margin-top: 50px;
+    font-size: 1.1rem;
+    padding: 20px;
+    border: 1px dashed var(--border-light);
+    border-radius: 6px;
+}

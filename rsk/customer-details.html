@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Details - RSK ENTERPRISES</title>
+    <link rel="stylesheet" href="css/customer-details.css">
+    <script>
+        if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="controls">
+            <h1 class="bill-system-header">
+                <a href="#" class="brand-name">Sabarish</a>
+                <span class="system-name">Accounting Software</span>
+            </h1>
+            <a href="index.html" class="dashboard">
+                <i class="fas fa-file-invoice"></i> New BILL
+            </a>
+            <a href="invoice-history.html" class="view-history-btn">
+                <i class="fas fa-history"></i> View Invoice History
+            </a>
+            <a href="customer-details.html" class="view-history-btn active">
+                <i class="fas fa-users"></i> Customer Details
+            </a>
+            <a href="shortcut.html" class="view-history-btn">
+                <i class="fas fa-bolt"></i> Product Shortcuts
+            </a>
+            <a href="recycle-bin.html" class="view-history-btn">
+                <i class="fas fa-trash-restore"></i> Recycle Bin
+            </a>
+            <button id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+
+        <div class="content">
+            <h2>Customer Details</h2>
+            
+            <div class="filters">
+                <input type="text" id="searchCustomer" placeholder="Search customers...">
+                <button id="addCustomerBtn">Add New Customer</button>
+            </div>
+            
+            <div class="customer-list" id="customerList">
+                <!-- Customers will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Customer Modal -->
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="customerModalTitle">Add New Customer</h3>
+            <form id="customerForm">
+                <div class="form-group">
+                    <label for="modalCustomerPhone">Phone Number *</label>
+                    <input type="text" id="modalCustomerPhone" required>
+                </div>
+                <div class="form-group">
+                    <label for="modalCustomerName">Name *</label>
+                    <input type="text" id="modalCustomerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="modalCustomerAddress">Address</label>
+                    <input type="text" id="modalCustomerAddress">
+                </div>
+                <div class="form-group">
+                    <label for="modalCustomerGSTIN">GSTIN</label>
+                    <input type="text" id="modalCustomerGSTIN">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Save Customer</button>
+                    <button type="button" id="cancelCustomer">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/db.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/customer-details.js"></script>
+</body>
+</html>

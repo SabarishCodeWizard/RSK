@@ -1,0 +1,424 @@
+/* styles.css */
+
+/* --- GENERAL STYLES AND VARIABLES (Must be consistent across all pages) --- */
+:root {
+    --primary-color: #007bff; /* Blue for primary actions/branding */
+    --secondary-color: #6c757d; /* Gray for secondary elements */
+    --success-color: #28a745; /* Green for success/save */
+    --danger-color: #dc3545; /* Red for delete/danger */
+    --info-color: #17a2b8; /* Cyan for view/share */
+    --bg-light: #f8f9fa; /* Very light gray background */
+    --bg-white: #ffffff; /* White for content areas */
+    --text-dark: #343a40; /* Dark text */
+    --border-light: #dee2e6; /* Light border color */
+    --shadow-light: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+/* --- LAYOUT CONTAINER --- */
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- SIDEBAR (Controls) - Reused from Customer Details --- */
+.controls {
+    width: 250px;
+    background-color: var(--text-dark);
+    color: var(--bg-white);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+}
+
+.bill-system-header {
+    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+    text-align: center;
+}
+
+.brand-name {
+    display: block;
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-decoration: none;
+    margin-bottom: 5px;
+}
+
+.system-name {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--secondary-color);
+    letter-spacing: 1px;
+}
+
+/* Sidebar Links/Buttons */
+.dashboard,
+.view-history-btn,
+#logoutBtn {
+    display: block;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: var(--bg-white);
+    background-color: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.dashboard i,
+.view-history-btn i,
+#logoutBtn i {
+    margin-right: 10px;
+}
+
+.dashboard:hover,
+.view-history-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--primary-color);
+}
+
+.view-history-btn.active {
+    background-color: var(--primary-color);
+    font-weight: 600;
+    color: var(--bg-white);
+}
+
+#logoutBtn {
+    margin-top: auto; /* Pushes logout to the bottom */
+    background-color: var(--danger-color);
+    color: var(--bg-white);
+}
+
+#logoutBtn:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
+
+/* --- MAIN CONTENT AREA --- */
+.content {
+    flex-grow: 1;
+    padding: 30px;
+    background-color: var(--bg-white);
+}
+
+.content h2 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border-light);
+    padding-bottom: 10px;
+}
+
+/* --- FILTERS (Search & Date Range) --- */
+.filters {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    align-items: center;
+    flex-wrap: wrap; /* Allows filters to wrap on smaller screens */
+}
+
+.filters input[type="text"],
+.filters input[type="date"] {
+    padding: 10px 15px;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    font-size: 1rem;
+    height: 40px; /* Standardize height */
+}
+
+#searchInput {
+    flex-grow: 2; /* Takes up more space */
+    min-width: 250px;
+}
+
+#dateFrom, #dateTo {
+    flex-grow: 1;
+    min-width: 150px;
+}
+
+#filterBtn, #clearFilters {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+    font-weight: 500;
+    height: 40px;
+}
+
+#filterBtn {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+#filterBtn:hover {
+    background-color: #0056b3;
+}
+
+#clearFilters {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+#clearFilters:hover {
+    background-color: #5a6268;
+}
+
+/* --- INVOICE LIST & CARDS --- */
+.invoice-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.invoice-card {
+    background-color: var(--bg-white);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: var(--shadow-light);
+    transition: transform 0.2s;
+}
+
+.invoice-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--primary-color);
+    padding-bottom: 10px;
+}
+
+.invoice-header h3 {
+    color: var(--primary-color);
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+.invoice-date {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    font-weight: 500;
+}
+
+.invoice-details p {
+    margin: 5px 0;
+    font-size: 0.95rem;
+}
+
+.invoice-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+/* Action Buttons */
+.btn-view, .btn-edit, .btn-share, .btn-delete {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background-color 0.2s;
+    font-weight: 500;
+}
+
+.btn-view {
+    background-color: var(--info-color);
+    color: white;
+}
+.btn-view:hover { background-color: #117a8b; }
+
+.btn-edit {
+    background-color: var(--primary-color);
+    color: white;
+}
+.btn-edit:hover { background-color: #0056b3; }
+
+.btn-share {
+    background-color: var(--success-color);
+    color: white;
+}
+.btn-share:hover { background-color: #1e7e34; }
+
+.btn-delete {
+    background-color: var(--danger-color);
+    color: white;
+}
+.btn-delete:hover { background-color: #c82333; }
+
+
+/* No Invoices Message */
+.invoice-list > p {
+    grid-column: 1 / -1; /* Make the message span all columns */
+    text-align: center;
+    color: var(--secondary-color);
+    margin-top: 50px;
+    font-size: 1.1rem;
+}
+
+/* --- MODAL STYLES (Reused with some additions) --- */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4); 
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: var(--bg-white);
+    margin: 5% auto; 
+    padding: 30px;
+    border-radius: 8px;
+    width: 90%; 
+    max-width: 500px; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.close {
+    color: var(--secondary-color);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 1;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+.close:hover,
+.close:focus {
+    color: var(--danger-color);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Form Groups and Inputs inside Modals */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Delete Confirmation Modal Specific Styles */
+#deleteModal .modal-content {
+    max-width: 400px;
+    text-align: center;
+}
+
+#deleteModal h3 {
+    color: var(--danger-color);
+    margin-bottom: 15px;
+}
+
+#deleteModal strong {
+    color: var(--danger-color);
+}
+
+#confirmInvoiceNumber {
+    margin: 15px 0;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-danger, #cancelDelete, #saveEditedInvoice {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+    font-weight: 600;
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+#cancelDelete {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+#cancelDelete:hover {
+    background-color: #5a6268;
+}
+
+/* Save Button in Edit Modal */
+#saveEditedInvoice {
+    background-color: var(--primary-color);
+    color: white;
+    width: 100%; /* Make it full width for emphasis */
+    margin-top: 15px;
+}
+
+#saveEditedInvoice:hover {
+    background-color: #0056b3;
+}

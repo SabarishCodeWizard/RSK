@@ -1,413 +1,222 @@
-// Check if user is logged in
-if (sessionStorage.getItem('isLoggedIn') !== 'true') {
-    window.location.href = 'login.html';
-}
-
-
-// Database initialization
-let db;
-
-function initDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open('PRFabricsInvoicesDB', 1);
-
-        request.onerror = function (event) {
-            console.error('Database error:', event.target.error);
-            reject('Database error');
-        };
-
-        request.onupgradeneeded = function (event) {
-            db = event.target.result;
-
-            // Create an object store for invoices
-            const invoiceStore = db.createObjectStore('invoices', { keyPath: 'invoiceNo' });
-
-            // Create indexes for searching
-            invoiceStore.createIndex('customerName', 'customerName', { unique: false });
-            invoiceStore.createIndex('invoiceDate', 'invoiceDate', { unique: false });
-        };
-
-        request.onsuccess = function (event) {
-            db = event.target.result;
-            resolve();
-        };
-    });
-}
-
-// Function to save invoice to database
-async function saveInvoiceToDB(invoiceData) {
-    const db = await initDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readwrite');
-        const store = transaction.objectStore(STORE_NAME);
-
-        // Add default values for new fields if not provided
-        invoiceData.paidAmount = invoiceData.paidAmount || 0;
-        invoiceData.status = invoiceData.status || 'pending';
-
-        const request = store.add(invoiceData);
-
-        request.onsuccess = function () {
-            resolve(request.result);
-        };
-
-        request.onerror = function (event) {
-            reject('Error saving invoice: ' + event.target.errorCode);
-        };
-    });
-}
-
-// Function to get all invoice data
-function getInvoiceData() {
-    const invoiceNo = document.getElementById('invoiceNo').value;
-    const invoiceDate = document.getElementById('invoiceDate').value;
-    const customerName = document.getElementById('customerName').value;
-    const customerAddress = document.getElementById('customerAddress').value;
-    const customerGSTIN = document.getElementById('customerGSTIN').value;
-    const state = document.getElementById('state').value;
-    const stateCode = document.getElementById('stateCode').value;
-    const transportMode = document.getElementById('transportMode').value;
-    const vehicleNumber = document.getElementById('vehicleNumber').value;
-    const supplyDate = document.getElementById('supplyDate').value;
-    const placeOfSupply = document.getElementById('placeOfSupply').value;
-    const reverseCharge = document.getElementById('reverseCharge').value;
-    const grandTotal = document.getElementById('grandTotal').textContent;
-    const amountInWords = document.getElementById('amountInWords').textContent;
-
-    // Get product data
-    const products = [];
-    const rows = document.getElementById('productTableBody').rows;
-    for (let i = 0; i < rows.length; i++) {
-        const row = rows[i];
-        products.push({
-            sno: row.cells[0].textContent,
-            description: row.querySelector('.product-description').value,
-            hsnCode: row.querySelector('.hsn-code').value,
-            qty: row.querySelector('.qty').value,
-            rate: row.querySelector('.rate').value,
-            amount: row.querySelector('.amount').textContent,
-            taxableValue: row.querySelector('.taxable-value').textContent
-        });
-    }
-
-    // Get tax data
-    const taxData = {
-        subTotal: document.getElementById('subTotal').textContent,
-        cgstRate: document.getElementById('cgstRate').value,
-        cgstAmount: document.getElementById('cgstAmount').textContent,
-        sgstRate: document.getElementById('sgstRate').value,
-        sgstAmount: document.getElementById('sgstAmount').textContent,
-        igstRate: document.getElementById('igstRate').value,
-        igstAmount: document.getElementById('igstAmount').textContent,
-        totalTaxAmount: document.getElementById('totalTaxAmount').textContent,
-        roundOff: document.getElementById('roundOff').textContent,
-        grandTotal: grandTotal
-    };
-
-    return {
-        invoiceNo,
-        invoiceDate,
-        customerName,
-        customerAddress,
-        customerGSTIN,
-        state,
-        stateCode,
-        transportMode,
-        vehicleNumber,
-        supplyDate,
-        placeOfSupply,
-        reverseCharge,
-        products,
-        taxData,
-        grandTotal,
-        amountInWords,
-        createdAt: new Date().toISOString()
-    };
-}
-
-// Function to search invoices
-function searchInvoices() {
-    const invoiceNo = document.getElementById('searchInvoiceNo').value.trim();
-    const customerName = document.getElementById('searchCustomer').value.trim();
-    const dateFrom = document.getElementById('searchDateFrom').value;
-    const dateTo = document.getElementById('searchDateTo').value;
-
-    const transaction = db.transaction(['invoices'], 'readonly');
-    const invoiceStore = transaction.objectStore('invoices');
-
-    let request;
-
-    if (invoiceNo) {
-        // Search by exact invoice number
-        request = invoiceStore.get(invoiceNo);
-        request.onsuccess = function (event) {
-            const result = event.target.result;
-            displaySearchResults(result ? [result] : []);
-        };
-    } else {
-        // Search by other criteria
-        const results = [];
-        let index;
-
-        if (customerName) {
-            index = invoiceStore.index('customerName');
-            request = index.openCursor(IDBKeyRange.only(customerName));
-        } else if (dateFrom || dateTo) {
-            index = invoiceStore.index('invoiceDate');
-            const range = dateFrom && dateTo
-                ? IDBKeyRange.bound(dateFrom, dateTo)
-                : dateFrom
-                    ? IDBKeyRange.lowerBound(dateFrom)
-                    : IDBKeyRange.upperBound(dateTo);
-            request = index.openCursor(range);
-        } else {
-            // Get all invoices if no search criteria
-            request = invoiceStore.openCursor();
-        }
-
-        request.onsuccess = function (event) {
-            const cursor = event.target.result;
-            if (cursor) {
-                results.push(cursor.value);
-                cursor.continue();
-            } else {
-                displaySearchResults(results);
-            }
-        };
-    }
-
-    request.onerror = function (event) {
-        console.error('Search error:', event.target.error);
-    };
-}
-
-// Function to display search results
-function displaySearchResults(invoices) {
-    const tbody = document.getElementById('invoiceResultsBody');
-    tbody.innerHTML = '';
-
-    if (invoices.length === 0) {
-        const row = document.createElement('tr');
-        row.innerHTML = '<td colspan="5">No invoices found</td>';
-        tbody.appendChild(row);
-        return;
-    }
-
-    invoices.forEach(invoice => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${invoice.invoiceNo}</td>
-            <td>${formatDate(invoice.invoiceDate)}</td>
-            <td>${invoice.customerName}</td>
-            <td>₹${invoice.grandTotal}</td>
-            <td><button class="view-invoice-btn" data-invoice="${invoice.invoiceNo}">View</button></td>
-        `;
-        tbody.appendChild(row);
-    });
-
-    // Add event listeners to view buttons
-    document.querySelectorAll('.view-invoice-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            loadInvoice(this.getAttribute('data-invoice'));
-        });
-    });
-}
-
-// Function to load an invoice from DB
-function loadInvoice(invoiceNo) {
-    const transaction = db.transaction(['invoices'], 'readonly');
-    const invoiceStore = transaction.objectStore('invoices');
-    const request = invoiceStore.get(invoiceNo);
-
-    request.onsuccess = function (event) {
-        const invoice = event.target.result;
-        if (invoice) {
-            populateInvoiceForm(invoice);
-        } else {
-            alert('Invoice not found');
-        }
-    };
-
-    request.onerror = function (event) {
-        console.error('Error loading invoice:', event.target.error);
-        alert('Error loading invoice');
-    };
-}
-
-// Function to populate form with invoice data
-function populateInvoiceForm(invoice) {
-    // Basic info
-    document.getElementById('invoiceNo').value = invoice.invoiceNo;
-    document.getElementById('invoiceDate').value = invoice.invoiceDate;
-    document.getElementById('customerName').value = invoice.customerName;
-    document.getElementById('customerAddress').value = invoice.customerAddress;
-    document.getElementById('customerGSTIN').value = invoice.customerGSTIN;
-    document.getElementById('state').value = invoice.state;
-    document.getElementById('stateCode').value = invoice.stateCode;
-    document.getElementById('transportMode').value = invoice.transportMode;
-    document.getElementById('vehicleNumber').value = invoice.vehicleNumber;
-    document.getElementById('supplyDate').value = invoice.supplyDate;
-    document.getElementById('placeOfSupply').value = invoice.placeOfSupply;
-    document.getElementById('reverseCharge').value = invoice.reverseCharge;
-
-    // Clear existing product rows
-    const tbody = document.getElementById('productTableBody');
-    tbody.innerHTML = '';
-
-    // Add product rows
-    invoice.products.forEach((product, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${index + 1}</td>
-            <td><input type="text" class="product-description" value="${product.description}"></td>
-            <td><input type="text" class="hsn-code" value="${product.hsnCode}"></td>
-            <td><input type="number" class="qty" value="${product.qty}"></td>
-            <td><input type="number" class="rate" value="${product.rate}" step="0.01"></td>
-            <td class="amount">${product.amount}</td>
-            <td class="taxable-value">${product.taxableValue}</td>
-            <td><button class="remove-row">X</button></td>
-        `;
-        tbody.appendChild(row);
-    });
-
-    // Add tax data
-    document.getElementById('cgstRate').value = invoice.taxData.cgstRate;
-    document.getElementById('sgstRate').value = invoice.taxData.sgstRate;
-    document.getElementById('igstRate').value = invoice.taxData.igstRate;
-
-    // Update calculated fields
-    document.getElementById('subTotal').textContent = invoice.taxData.subTotal;
-    document.getElementById('cgstAmount').textContent = invoice.taxData.cgstAmount;
-    document.getElementById('sgstAmount').textContent = invoice.taxData.sgstAmount;
-    document.getElementById('igstAmount').textContent = invoice.taxData.igstAmount;
-    document.getElementById('totalTaxAmount').textContent = invoice.taxData.totalTaxAmount;
-    document.getElementById('roundOff').textContent = invoice.taxData.roundOff;
-    document.getElementById('grandTotal').textContent = invoice.taxData.grandTotal;
-    document.getElementById('amountInWords').textContent = invoice.amountInWords;
-}
-
-// Helper function to format date
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-IN');
-}
-
-// Update the DOMContentLoaded event listener
+// invoice-history.js - Invoice history page functionality
 document.addEventListener('DOMContentLoaded', async function () {
-    // Set current date as default for invoice date
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('invoiceDate').value = today;
-    document.getElementById('supplyDate').value = today;
-    document.getElementById('searchDateFrom').value = today;
-    document.getElementById('searchDateTo').value = today;
+    await invoiceDB.init();
+    loadInvoices();
 
-    // Initialize database
-    try {
-        await initDB();
-        console.log('Database initialized');
-    } catch (error) {
-        console.error('Failed to initialize database:', error);
-    }
+    // Filter functionality
+    document.getElementById('filterBtn').addEventListener('click', loadInvoices);
+    document.getElementById('clearFilters').addEventListener('click', clearFilters);
 
-    // Event listeners for buttons
-    document.getElementById('addRow').addEventListener('click', addProductRow);
-    document.getElementById('resetForm').addEventListener('click', resetForm);
-    document.getElementById('generatePDF').addEventListener('click', async function () {
-        try {
-            await saveInvoiceToDB();
-            generatePDF();
-        } catch (error) {
-            console.error('Error saving invoice:', error);
-            // Still generate PDF even if save fails
-            generatePDF();
-        }
-    });
-    document.getElementById('searchInvoices').addEventListener('click', searchInvoices);
-
-    // Event delegation for table row actions
-    document.getElementById('productTable').addEventListener('click', function (e) {
-        if (e.target.classList.contains('remove-row')) {
-            removeProductRow(e.target);
-        }
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', function () {
+        sessionStorage.removeItem('isLoggedIn');
+        window.location.href = 'login.html';
     });
 
-    // Event delegation for calculations
-    document.getElementById('productTable').addEventListener('input', function (e) {
-        if (e.target.classList.contains('qty') || e.target.classList.contains('rate')) {
-            const row = e.target.closest('tr');
-            calculateRowTotal(row);
-            updateTotals();
-        }
+    // Modal close buttons
+    document.querySelectorAll('.close').forEach(closeBtn => {
+        closeBtn.addEventListener('click', function () {
+            this.closest('.modal').style.display = 'none';
+        });
     });
-
-    // Event listeners for tax rate changes
-    document.getElementById('cgstRate').addEventListener('input', updateTotals);
-    document.getElementById('sgstRate').addEventListener('input', updateTotals);
-    document.getElementById('igstRate').addEventListener('input', updateTotals);
-
-    // Add one row by default
-    addProductRow();
 });
 
-// ... (keep all your existing functions like addProductRow, removeProductRow, etc.)
-
-// Add this function to handle invoice deletion
-function deleteInvoice(invoiceNo) {
-    if (confirm(`Are you sure you want to delete invoice ${invoiceNo}? This action cannot be undone.`)) {
-        const transaction = db.transaction(['invoices'], 'readwrite');
-        const invoiceStore = transaction.objectStore('invoices');
-        const request = invoiceStore.delete(invoiceNo);
-
-        request.onsuccess = function () {
-            alert(`Invoice ${invoiceNo} deleted successfully`);
-            searchInvoices(); // Refresh the results
-        };
-
-        request.onerror = function (event) {
-            console.error('Error deleting invoice:', event.target.error);
-            alert('Error deleting invoice');
-        };
-    }
+async function loadInvoices() {
+    const invoices = await invoiceDB.getAllInvoices();
+    const filteredInvoices = filterInvoices(invoices);
+    displayInvoices(filteredInvoices);
 }
 
-// Update the displaySearchResults function to include the remove button
-function displaySearchResults(invoices) {
-    const tbody = document.getElementById('invoiceResultsBody');
-    tbody.innerHTML = '';
+function filterInvoices(invoices) {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const dateFrom = document.getElementById('dateFrom').value;
+    const dateTo = document.getElementById('dateTo').value;
+
+    return invoices.filter(invoice => {
+        // Search filter
+        const matchesSearch = !searchTerm ||
+            invoice.invoiceNumber.toLowerCase().includes(searchTerm) ||
+            invoice.customerName.toLowerCase().includes(searchTerm) ||
+            invoice.customerPhone.includes(searchTerm);
+
+        // Date filter
+        const invoiceDate = new Date(invoice.date);
+        const fromDate = dateFrom ? new Date(dateFrom) : null;
+        const toDate = dateTo ? new Date(dateTo) : null;
+
+        const matchesDate = (!fromDate || invoiceDate >= fromDate) &&
+            (!toDate || invoiceDate <= toDate);
+
+        return matchesSearch && matchesDate;
+    });
+}
+
+function displayInvoices(invoices) {
+    const invoiceList = document.getElementById('invoiceList');
 
     if (invoices.length === 0) {
-        const row = document.createElement('tr');
-        row.innerHTML = '<td colspan="5">No invoices found</td>';
-        tbody.appendChild(row);
+        invoiceList.innerHTML = '<p>No invoices found.</p>';
         return;
     }
 
-    invoices.forEach(invoice => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${invoice.invoiceNo}</td>
-            <td>${formatDate(invoice.invoiceDate)}</td>
-            <td>${invoice.customerName}</td>
-            <td>₹${invoice.grandTotal}</td>
-            <td class="actions-cell">
-                <button class="view-invoice-btn" data-invoice="${invoice.invoiceNo}">View</button>
-                <button class="remove-invoice-btn" data-invoice="${invoice.invoiceNo}">Delete</button>
-            </td>
-        `;
-        tbody.appendChild(row);
-    });
+    invoiceList.innerHTML = invoices.map(invoice => `
+    <div class="invoice-card">
+      <div class="invoice-header">
+        <h3>Invoice #${invoice.invoiceNumber}</h3>
+        <span class="invoice-date">${Utils.formatDate(invoice.date)}</span>
+      </div>
+      <div class="invoice-details">
+        <p><strong>Customer:</strong> ${invoice.customerName}</p>
+        <p><strong>Phone:</strong> ${invoice.customerPhone}</p>
+        <p><strong>Amount:</strong> ₹${Utils.formatCurrency(invoice.grandTotal)}</p>
+      </div>
+      <div class="invoice-actions">
+        <button class="btn-view" onclick="viewInvoice(${invoice.id})">View</button>
+        <button class="btn-edit" onclick="editInvoice(${invoice.id})">Edit</button>
+        <button class="btn-share" onclick="shareInvoice(${invoice.id})">Share</button>
+        <button class="btn-delete" onclick="confirmDelete(${invoice.id}, '${invoice.invoiceNumber}')">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
 
-    // Add event listeners to view buttons
-    document.querySelectorAll('.view-invoice-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            loadInvoice(this.getAttribute('data-invoice'));
-        });
-    });
+function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('dateFrom').value = '';
+    document.getElementById('dateTo').value = '';
+    loadInvoices();
+}
 
-    // Add event listeners to remove buttons
-    document.querySelectorAll('.remove-invoice-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            deleteInvoice(this.getAttribute('data-invoice'));
-        });
+async function viewInvoice(id) {
+    const invoice = await invoiceDB.getInvoice(id);
+
+    // Create a view-only version of the invoice
+    const invoiceHTML = generateInvoiceHTML(invoice, true);
+
+    const newWindow = window.open('', '_blank');
+    newWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Invoice ${invoice.invoiceNumber}</title>
+      <link rel="stylesheet" href="css/styles.css">
+    </head>
+    <body>
+      ${invoiceHTML}
+      <script>
+        window.print();
+      </script>
+    </body>
+    </html>
+  `);
+    newWindow.document.close();
+}
+
+async function editInvoice(id) {
+    const invoice = await invoiceDB.getInvoice(id);
+    const modal = document.getElementById('editInvoiceModal');
+    const form = document.getElementById('editInvoiceForm');
+
+    form.innerHTML = generateEditForm(invoice);
+    modal.style.display = 'block';
+
+    // Set up save button
+    document.getElementById('saveEditedInvoice').addEventListener('click', async function () {
+        await saveEditedInvoice(id);
     });
+}
+
+function generateEditForm(invoice) {
+    return `
+    <form id="invoiceEditForm">
+      <div class="form-group">
+        <label for="editCustomerName">Customer Name:</label>
+        <input type="text" id="editCustomerName" value="${invoice.customerName}">
+      </div>
+      <div class="form-group">
+        <label for="editCustomerPhone">Phone:</label>
+        <input type="text" id="editCustomerPhone" value="${invoice.customerPhone}">
+      </div>
+      <div class="form-group">
+        <label for="editCustomerAddress">Address:</label>
+        <input type="text" id="editCustomerAddress" value="${invoice.customerAddress}">
+      </div>
+      <div class="form-group">
+        <label for="editGrandTotal">Total Amount:</label>
+        <input type="number" id="editGrandTotal" value="${invoice.grandTotal}" step="0.01">
+      </div>
+      <button type="button" id="saveEditedInvoice" class="btn-primary">Save Changes</button>
+    </form>
+  `;
+}
+
+async function saveEditedInvoice(id) {
+    const invoice = await invoiceDB.getInvoice(id);
+
+    // Update invoice with edited values
+    invoice.customerName = document.getElementById('editCustomerName').value;
+    invoice.customerPhone = document.getElementById('editCustomerPhone').value;
+    invoice.customerAddress = document.getElementById('editCustomerAddress').value;
+    invoice.grandTotal = parseFloat(document.getElementById('editGrandTotal').value);
+
+    await invoiceDB.saveInvoice(invoice);
+
+    document.getElementById('editInvoiceModal').style.display = 'none';
+    loadInvoices();
+    alert('Invoice updated successfully!');
+}
+
+function confirmDelete(id, invoiceNumber) {
+    const modal = document.getElementById('deleteModal');
+    document.getElementById('invoiceToDelete').textContent = invoiceNumber;
+    document.getElementById('confirmInvoiceNumber').value = '';
+    modal.style.display = 'block';
+
+    // Set up delete confirmation
+    document.getElementById('confirmDelete').onclick = function () {
+        const enteredNumber = document.getElementById('confirmInvoiceNumber').value;
+
+        if (enteredNumber === invoiceNumber) {
+            deleteInvoice(id);
+        } else {
+            alert('Invoice number does not match. Please try again.');
+        }
+    };
+
+    document.getElementById('cancelDelete').onclick = function () {
+        modal.style.display = 'none';
+    };
+}
+
+async function deleteInvoice(id) {
+    await invoiceDB.deleteInvoice(id);
+    document.getElementById('deleteModal').style.display = 'none';
+    loadInvoices();
+    alert('Invoice moved to recycle bin.');
+}
+
+async function shareInvoice(id) {
+    const invoice = await invoiceDB.getInvoice(id);
+
+    const message = `Invoice #${invoice.invoiceNumber}
+  
+Customer: ${invoice.customerName}
+Date: ${Utils.formatDate(invoice.date)}
+Total Amount: ₹${Utils.formatCurrency(invoice.grandTotal)}
+
+Thank you for your business!
+RSK ENTERPRISES`;
+
+    Utils.shareOnWhatsApp(invoice.customerPhone, message);
+}
+
+function generateInvoiceHTML(invoice, isViewOnly = false) {
+    // This would generate the HTML for the invoice similar to index.html
+    // Implementation would be similar to the invoice structure in index.html
+    // but with the data from the invoice object
+    return `
+    <div class="invoice-container">
+      <!-- Invoice HTML structure with invoice data -->
+    </div>
+  `;
 }

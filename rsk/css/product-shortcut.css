@@ -1,0 +1,268 @@
+/* styles.css */
+
+/* --- GENERAL STYLES AND VARIABLES (Must be consistent across all pages) --- */
+:root {
+    --primary-color: #007bff; /* Blue for primary actions/branding */
+    --secondary-color: #6c757d; /* Gray for secondary elements */
+    --success-color: #28a745; /* Green for success/save */
+    --danger-color: #dc3545; /* Red for delete/danger */
+    --info-color: #17a2b8;
+    --bg-light: #f8f9fa; /* Very light gray background */
+    --bg-white: #ffffff; /* White for content areas */
+    --text-dark: #343a40; /* Dark text */
+    --border-light: #dee2e6; /* Light border color */
+    --shadow-light: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+/* --- LAYOUT CONTAINER --- */
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- SIDEBAR (Controls) - Reused from previous pages --- */
+.controls {
+    width: 250px;
+    background-color: var(--text-dark);
+    color: var(--bg-white);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+}
+
+.bill-system-header {
+    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+    text-align: center;
+}
+
+.brand-name {
+    display: block;
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-decoration: none;
+    margin-bottom: 5px;
+}
+
+.system-name {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--secondary-color);
+    letter-spacing: 1px;
+}
+
+/* Sidebar Links/Buttons */
+.dashboard,
+.view-history-btn,
+#logoutBtn {
+    display: block;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: var(--bg-white);
+    background-color: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.dashboard i,
+.view-history-btn i,
+#logoutBtn i {
+    margin-right: 10px;
+}
+
+.dashboard:hover,
+.view-history-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--primary-color);
+}
+
+.view-history-btn.active {
+    background-color: var(--primary-color);
+    font-weight: 600;
+    color: var(--bg-white);
+}
+
+#logoutBtn {
+    margin-top: auto;
+    background-color: var(--danger-color);
+    color: var(--bg-white);
+}
+
+#logoutBtn:hover {
+    background-color: #c82333;
+}
+
+/* --- MAIN CONTENT AREA --- */
+.content {
+    flex-grow: 1;
+    padding: 30px;
+    background-color: var(--bg-white);
+}
+
+.content h2 {
+    color: var(--primary-color);
+    margin-bottom: 30px;
+    border-bottom: 2px solid var(--border-light);
+    padding-bottom: 10px;
+}
+
+/* --- ADD NEW SHORTCUT FORM --- */
+.shortcut-form {
+    background-color: var(--bg-light);
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+    margin-bottom: 40px;
+    max-width: 600px; /* Constrain form width */
+}
+
+.shortcut-form h3 {
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--border-light);
+}
+
+#shortcutForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    /* Ensures consistent spacing inside the form */
+    margin-bottom: 0; 
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+}
+
+.form-group input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input[type="text"]:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn-primary {
+    padding: 10px 20px;
+    background-color: var(--success-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+    font-weight: 600;
+    margin-top: 10px; /* Spacing below the last input */
+    align-self: flex-start; /* Aligns button to the left */
+}
+
+.btn-primary:hover {
+    background-color: #1e7e34;
+}
+
+/* --- EXISTING SHORTCUTS LIST --- */
+.shortcuts-list h3 {
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+#shortcutsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 15px;
+}
+
+.shortcut-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bg-white);
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 5px solid var(--primary-color);
+    box-shadow: var(--shadow-light);
+    transition: box-shadow 0.2s;
+}
+
+.shortcut-card:hover {
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+.shortcut-info {
+    flex-grow: 1;
+    font-size: 1rem;
+    color: var(--text-dark);
+}
+
+.shortcut-info strong {
+    font-weight: 700;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    margin-right: 5px;
+}
+
+.btn-delete {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    background-color: var(--danger-color);
+    color: white;
+    margin-left: 15px;
+    transition: background-color 0.2s;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+}
+
+/* No Shortcuts Message */
+#shortcutsContainer > p {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--secondary-color);
+    margin-top: 20px;
+    font-size: 1rem;
+}

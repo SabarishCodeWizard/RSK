@@ -17,260 +17,239 @@
 </head>
 
 <body>
-    <div class="main"></div>
     <div class="container">
         <div class="controls">
             <h1 class="bill-system-header">
                 <a href="#" class="brand-name">Sabarish</a>
                 <span class="system-name">Accounting Software</span>
             </h1>
-            <a href="invoice-history.html" class="view-history-btn">View Invoice History</a>
-            <a href="dashboard.html" class="dashboard">Dashboard Analytics</a>
+            <a href="index.html" class="dashboard active">
+                <i class="fas fa-file-invoice"></i> New BILL
+            </a>
+
+            <a href="invoice-history.html" class="view-history-btn">
+                <i class="fas fa-history"></i> View Invoice History
+            </a>
+
+            <a href="customer-details.html" class="view-history-btn">
+                <i class="fas fa-users"></i> Customer Details
+            </a>
+
+            <a href="shortcut.html" class="view-history-btn">
+                <i class="fas fa-bolt"></i> Product Shortcuts
+            </a>
+
+            <a href="recycle-bin.html" class="view-history-btn">
+                <i class="fas fa-trash-restore"></i> Recycle Bin
+            </a>
+
             <div class="button-group">
-                <button id="generatePDF">Generate PDF</button>
-                <button id="resetForm">Reset Form</button>
+                <button id="generatePDF">
+                    <i class="fas fa-file-invoice"></i> Generate BILL
+                </button>
+
+                <button id="saveBill">
+                    <i class="fas fa-save"></i> Save BILL
+                </button>
+
+                <button id="resetForm">
+                    <i class="fas fa-undo"></i> Reset BILL
+                </button>
             </div>
-            <button id="logoutBtn">Logout</button>
+
+            <button id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
         </div>
 
-        <div id="invoice" class="invoice-container">
-            <div class="invoice-header">
-                <div class="company-details">
-                    <h2>RSK ENTERPRISES</h2>
-                    <p>76(3) PADMAVATHIPURAM, ANGERIPALAYAM ROAD,</p>
-                    <p>TIRUPUR 641-602. CELL NO: 8608127349</p>
-                    <p>GSTIN: 33EQEPR2516A1ZB</p>
-                </div>
-                <div class="invoice-title">
-                    <h2>Tax Invoice</h2>
-                    <div class="invoice-number">
-                        <label for="invoiceNo">Invoice No:</label>
-                        <input type="text" id="invoiceNo" placeholder="e.g. 015">
+        <div class="content">
+            <div id="invoice" class="invoice-container">
+                <div class="invoice-header">
+                    <div class="company-details">
+                        <h2>RSK ENTERPRISES</h2>
+                        <p>76(3) PADMAVATHIPURAM, ANGERIPALAYAM ROAD,</p>
+                        <p>TIRUPUR 641-602. CELL NO: 8608127349</p>
+                        <p>GSTIN: 33EQEPR2516A1ZB</p>
                     </div>
-                    <div class="invoice-date">
-                        <label for="invoiceDate">Invoice Date:</label>
-                        <input type="date" id="invoiceDate">
-                    </div>
-                </div>
-            </div>
-
-            <div class="billing-info">
-                <div class="bill-to">
-                    <h3>Bill to Party</h3>
-                    <div class="form-group">
-                        <label for="customerName">Name:</label>
-                        <input type="text" id="customerName" placeholder="e.g. SLN TEX">
-                    </div>
-                    <div class="form-group">
-                        <label for="customerAddress">Address:</label>
-                        <input type="text" id="customerAddress" placeholder="e.g. 1/1B,EAST Extn,M.S.NAGAR, TIRUPUR-7">
-                    </div>
-                    <div class="form-group">
-                        <label for="customerGSTIN">GSTIN:</label>
-                        <input type="text" id="customerGSTIN" placeholder="e.g. 33DNSPS0423P2ZD">
-                    </div>
-                    <div class="form-group">
-                        <label for="state">State:</label>
-                        <input type="text" id="state" value="TAMILNADU">
-                        <label for="stateCode">Code:</label>
-                        <input type="text" id="stateCode" value="33" class="short-input">
-                    </div>
-                </div>
-                <div class="shipping-info">
-                    <div class="form-group">
-                        <label for="transportMode">Transport Mode:</label>
-                        <input type="text" id="transportMode">
-                    </div>
-                    <div class="form-group">
-                        <label for="vehicleNumber">Vehicle number:</label>
-                        <input type="text" id="vehicleNumber">
-                    </div>
-                    <div class="form-group">
-                        <label for="supplyDate">Date of Supply:</label>
-                        <input type="date" id="supplyDate">
-                    </div>
-                    <div class="form-group">
-                        <label for="placeOfSupply">Place of Supply:</label>
-                        <input type="text" id="placeOfSupply">
-                    </div>
-                    <div class="form-group">
-                        <label for="reverseCharge">Reverse Charge (Y/N):</label>
-                        <select id="reverseCharge">
-                            <option value="N">N</option>
-                            <option value="Y">Y</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-table-container">
-                <table id="productTable">
-                    <thead>
-                        <tr>
-                            <th>S.No.</th>
-                            <th>Product Description</th>
-                            <th>HSN code</th>
-                            <th>Qty</th>
-                            <th>Rate</th>
-                            <th>Amount</th>
-                            <th>Taxable Value</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="productTableBody">
-                        <tr>
-                            <td>1</td>
-                            <td><input type="text" class="product-description"></td>
-                            <td><input type="text" class="hsn-code"></td>
-                            <td><input type="number" class="qty" value="0"></td>
-                            <td><input type="number" class="rate" value="0.00"></td>
-                            <td class="amount">0.00</td>
-                            <td class="taxable-value">0.00</td>
-                            <td><button class="remove-row">X</button></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <button id="addRow">Add Product</button>
-            </div>
-
-            <div class="calculation-section">
-                <div class="tax-calculation">
-                    <div class="tax-row">
-                        <label>Total:</label>
-                        <span id="subTotal">0.00</span>
-                    </div>
-                    <div class="tax-row">
-                        <label for="cgstRate">Add: CGST:</label>
-                        <input type="number" id="cgstRate" value="9" class="tax-rate">%
-                        <span id="cgstAmount">0.00</span>
-                    </div>
-                    <div class="tax-row">
-                        <label for="sgstRate">Add: SGST:</label>
-                        <input type="number" id="sgstRate" value="9" class="tax-rate">%
-                        <span id="sgstAmount">0.00</span>
-                    </div>
-                    <div class="tax-row">
-                        <label for="igstRate">Add: IGST:</label>
-                        <input type="number" id="igstRate" value="0" class="tax-rate">%
-                        <span id="igstAmount">0.00</span>
-                    </div>
-                    <div class="tax-row">
-                        <label>Total Tax Amount:</label>
-                        <span id="totalTaxAmount">0.00</span>
-                    </div>
-                    <div class="tax-row">
-                        <label>Round Off:</label>
-                        <span id="roundOff">0.00</span>
-                    </div>
-                    <div class="tax-row total">
-                        <label>Total Amount after Tax:</label>
-                        <span id="grandTotal">0.00</span>
-                    </div>
-                    <div class="tax-row">
-                        <label>Amount in Words:</label>
-                        <span id="amountInWords">Zero rupees only</span>
+                    <div class="invoice-title">
+                        <h2>Tax Invoice</h2>
+                        <div class="invoice-number">
+                            <label for="invoiceNo">Invoice No:</label>
+                            <input type="text" id="invoiceNo" placeholder="e.g. 015">
+                        </div>
+                        <div class="invoice-date">
+                            <label for="invoiceDate">Invoice Date:</label>
+                            <input type="date" id="invoiceDate">
+                        </div>
                     </div>
                 </div>
 
-                <div class="bank-details">
-                    <h3>Bank Details</h3>
-                    <div class="bank-row">
-                        <label>NAME:</label>
-                        <span>RSK ENTERPRISES</span>
+                <div class="billing-info">
+                    <div class="bill-to">
+                        <h3>Bill to Party</h3>
+                        <div class="form-group">
+                            <label for="customerPhone">Phone Number:</label>
+                            <input type="text" id="customerPhone" placeholder="e.g. 9876543210" maxlength="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerName">Name:</label>
+                            <input type="text" id="customerName" placeholder="e.g. SLN TEX">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerAddress">Address:</label>
+                            <input type="text" id="customerAddress"
+                                placeholder="e.g. 1/1B,EAST Extn,M.S.NAGAR, TIRUPUR-7">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerGSTIN">GSTIN:</label>
+                            <input type="text" id="customerGSTIN" placeholder="e.g. 33DNSPS0423P2ZD">
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State:</label>
+                            <input type="text" id="state" value="TAMILNADU">
+                            <label for="stateCode">Code:</label>
+                            <input type="text" id="stateCode" value="33" class="short-input">
+                        </div>
                     </div>
-                    <div class="bank-row">
-                        <label>BANK NAME:</label>
-                        <span>CANARA BANK</span>
-                    </div>
-                    <div class="bank-row">
-                        <label>BANK A/C NO:</label>
-                        <span>120033201829</span>
-                    </div>
-                    <div class="bank-row">
-                        <label>BANK IFSC CODE:</label>
-                        <span>CNRBOO16563</span>
+                    <div class="shipping-info">
+                        <div class="form-group">
+                            <label for="transportMode">Transport Mode:</label>
+                            <input type="text" id="transportMode">
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleNumber">Vehicle number:</label>
+                            <input type="text" id="vehicleNumber">
+                        </div>
+                        <div class="form-group">
+                            <label for="supplyDate">Date of Supply:</label>
+                            <input type="date" id="supplyDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="placeOfSupply">Place of Supply:</label>
+                            <input type="text" id="placeOfSupply">
+                        </div>
+                        <div class="form-group">
+                            <label for="reverseCharge">Reverse Charge (Y/N):</label>
+                            <select id="reverseCharge">
+                                <option value="N">N</option>
+                                <option value="Y">Y</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="signature-section">
-                <div class="declaration">
-                    <p>Certified that the particulars given above are true and correct</p>
-                    <p>**TERMS AND CONDITIONS APPLY FOR RSK ENTERPRISES</p>
+                <div class="product-table-container">
+                    <table id="productTable">
+                        <thead>
+                            <tr>
+                                <th>S.No.</th>
+                                <th>Product Description</th>
+                                <th>HSN code</th>
+                                <th>Qty</th>
+                                <th>Rate</th>
+                                <th>Amount</th>
+                                <th>Taxable Value</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTableBody">
+                            <tr>
+                                <td>1</td>
+                                <td><input type="text" class="product-description"></td>
+                                <td><input type="text" class="hsn-code"></td>
+                                <td><input type="number" class="qty" value="0"></td>
+                                <td><input type="number" class="rate" value="0.00"></td>
+                                <td class="amount">0.00</td>
+                                <td class="taxable-value">0.00</td>
+                                <td><button class="remove-row">X</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button id="addRow">Add Product</button>
                 </div>
-                <div class="customer-signature">
-                    <p>Agreed and accepted the conditions and signed</p>
-                    <p class="signature-line">Signature of Customer</p>
-                    <p>Authorized signatory</p>
+
+                <div class="calculation-section">
+                    <div class="tax-calculation">
+                        <div class="tax-row">
+                            <label>Total:</label>
+                            <span id="subTotal">0.00</span>
+                        </div>
+                        <div class="tax-row">
+                            <label for="cgstRate">Add: CGST:</label>
+                            <input type="number" id="cgstRate" value="9" class="tax-rate">%
+                            <span id="cgstAmount">0.00</span>
+                        </div>
+                        <div class="tax-row">
+                            <label for="sgstRate">Add: SGST:</label>
+                            <input type="number" id="sgstRate" value="9" class="tax-rate">%
+                            <span id="sgstAmount">0.00</span>
+                        </div>
+                        <div class="tax-row">
+                            <label for="igstRate">Add: IGST:</label>
+                            <input type="number" id="igstRate" value="0" class="tax-rate">%
+                            <span id="igstAmount">0.00</span>
+                        </div>
+                        <div class="tax-row">
+                            <label>Total Tax Amount:</label>
+                            <span id="totalTaxAmount">0.00</span>
+                        </div>
+                        <div class="tax-row">
+                            <label>Round Off:</label>
+                            <span id="roundOff">0.00</span>
+                        </div>
+                        <div class="tax-row total">
+                            <label>Total Amount after Tax:</label>
+                            <span id="grandTotal">0.00</span>
+                        </div>
+                        <div class="tax-row">
+                            <label>Amount in Words:</label>
+                            <span id="amountInWords">Zero rupees only</span>
+                        </div>
+                    </div>
+
+                    <div class="bank-details">
+                        <h3>Bank Details</h3>
+                        <div class="bank-row">
+                            <label>NAME:</label>
+                            <span>RSK ENTERPRISES</span>
+                        </div>
+                        <div class="bank-row">
+                            <label>BANK NAME:</label>
+                            <span>CANARA BANK</span>
+                        </div>
+                        <div class="bank-row">
+                            <label>BANK A/C NO:</label>
+                            <span>120033201829</span>
+                        </div>
+                        <div class="bank-row">
+                            <label>BANK IFSC CODE:</label>
+                            <span>CNRBOO16563</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="company-signature">
-                    <p class="signature-line">For RSK ENTERPRISES</p>
-                    <p>Authorized signatory</p>
+
+                <div class="signature-section">
+                    <div class="declaration">
+                        <p>Certified that the particulars given above are true and correct</p>
+                        <p>**TERMS AND CONDITIONS APPLY FOR RSK ENTERPRISES</p>
+                    </div>
+                    <div class="customer-signature">
+                        <p>Agreed and accepted the conditions and signed</p>
+                        <p class="signature-line">Signature of Customer</p>
+                        <p>Authorized signatory</p>
+                    </div>
+                    <div class="company-signature">
+                        <p class="signature-line">For RSK ENTERPRISES</p>
+                        <p>Authorized signatory</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    <script src="js/db.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/pdf.js"></script>
     <script src="js/script.js"></script>
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-grid">
-                <div class="footer-section about">
-                    <h3>RSK ENTERPRISES</h3>
-                    <p>Your trusted partner for quality Tissues and Cups since 2022.</p>
-                    <div class="social-links">
-                        <a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
-                </div>
-    
-                <div class="footer-section links">
-                    <h3>Quick Links</h3>
-                    <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="#">Products</a></li>
-                        <li><a href="#">Services</a></li>
-                        <li><a href="invoice-history.html">Invoice History</a></li>
-                        <li><a href="#">About Us</a></li>
-                    </ul>
-                </div>
-    
-                <div class="footer-section contact">
-                    <h3>Contact Us</h3>
-                    <div class="contact-info">
-                        <p><i class="fas fa-map-marker-alt"></i> 76(3) PADMAVATHIPURAM, ANGERIPALAYAM ROAD</p>
-                        <p><i class="fas fa-phone"></i> <a href="tel:9952520181">+91 8608127349</a></p>
-                        <p><i class="fas fa-envelope"></i> <a href="mailto:info@prfabrics.com">rskenterprises@gmail.com</a></p>
-                    </div>
-                </div>
-    
-                <div class="footer-section newsletter">
-                    <h3>Newsletter</h3>
-                    <p>Subscribe to get updates on new products and special offers</p>
-                    <form class="newsletter-form">
-                        <input type="email" placeholder="Your Email Address" required>
-                        <button type="submit">Subscribe</button>
-                    </form>
-                </div>
-            </div>
-    
-            <div class="footer-bottom">
-                <div class="footer-bottom-content">
-                    <p>&copy; 2025 RSK ENTERPRISES Billing Software. All Rights Reserved.</p>
-                    <div class="developer-credit">
-                        <p>Developed by <a href="http://instagram.com/r_sabarish_k/" target="_blank">Sabarish R</a> | 
-                        <a href="tel:7845081278">7845081278</a></p>
-                        <div class="developer-links">
-                            <a href="https://github.com/SabarishCodeWizard" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                            <a href="https://www.linkedin.com/in/sabarish777" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                            <a href="#" target="_blank" aria-label="Portfolio"><i class="fas fa-globe"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
 </body>
 
 </html>
