@@ -1,222 +1,413 @@
 // invoice-history.js - Invoice history page functionality
 document.addEventListener('DOMContentLoaded', async function () {
-    await invoiceDB.init();
-    loadInvoices();
+  await invoiceDB.init();
+  loadInvoices();
 
-    // Filter functionality
-    document.getElementById('filterBtn').addEventListener('click', loadInvoices);
-    document.getElementById('clearFilters').addEventListener('click', clearFilters);
+  // Filter functionality
+  document.getElementById('filterBtn').addEventListener('click', loadInvoices);
+  document.getElementById('clearFilters').addEventListener('click', clearFilters);
 
-    // Logout
-    document.getElementById('logoutBtn').addEventListener('click', function () {
-        sessionStorage.removeItem('isLoggedIn');
-        window.location.href = 'login.html';
+  // Logout
+  document.getElementById('logoutBtn').addEventListener('click', function () {
+    sessionStorage.removeItem('isLoggedIn');
+    window.location.href = 'login.html';
+  });
+
+  // Modal close buttons
+  document.querySelectorAll('.close').forEach(closeBtn => {
+    closeBtn.addEventListener('click', function () {
+      this.closest('.modal').style.display = 'none';
     });
+  });
 
-    // Modal close buttons
-    document.querySelectorAll('.close').forEach(closeBtn => {
-        closeBtn.addEventListener('click', function () {
-            this.closest('.modal').style.display = 'none';
-        });
-    });
+  // Close modal when clicking outside
+  window.addEventListener('click', function (e) {
+    if (e.target.classList.contains('modal')) {
+      e.target.style.display = 'none';
+    }
+  });
 });
 
 async function loadInvoices() {
-    const invoices = await invoiceDB.getAllInvoices();
-    const filteredInvoices = filterInvoices(invoices);
-    displayInvoices(filteredInvoices);
+  const invoices = await invoiceDB.getAllInvoices();
+  const filteredInvoices = filterInvoices(invoices);
+  displayInvoices(filteredInvoices);
 }
+// invoice-history.js - Replace the shareInvoice function
+
 
 function filterInvoices(invoices) {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const dateFrom = document.getElementById('dateFrom').value;
-    const dateTo = document.getElementById('dateTo').value;
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  const dateFrom = document.getElementById('dateFrom').value;
+  const dateTo = document.getElementById('dateTo').value;
 
-    return invoices.filter(invoice => {
-        // Search filter
-        const matchesSearch = !searchTerm ||
-            invoice.invoiceNumber.toLowerCase().includes(searchTerm) ||
-            invoice.customerName.toLowerCase().includes(searchTerm) ||
-            invoice.customerPhone.includes(searchTerm);
+  return invoices.filter(invoice => {
+    // Search filter
+    const matchesSearch = !searchTerm ||
+      invoice.invoiceNumber.toLowerCase().includes(searchTerm) ||
+      invoice.customerName.toLowerCase().includes(searchTerm) ||
+      invoice.customerPhone.includes(searchTerm);
 
-        // Date filter
-        const invoiceDate = new Date(invoice.date);
-        const fromDate = dateFrom ? new Date(dateFrom) : null;
-        const toDate = dateTo ? new Date(dateTo) : null;
+    // Date filter
+    const invoiceDate = new Date(invoice.date);
+    const fromDate = dateFrom ? new Date(dateFrom) : null;
+    const toDate = dateTo ? new Date(dateTo) : null;
 
-        const matchesDate = (!fromDate || invoiceDate >= fromDate) &&
-            (!toDate || invoiceDate <= toDate);
+    const matchesDate = (!fromDate || invoiceDate >= fromDate) &&
+      (!toDate || invoiceDate <= toDate);
 
-        return matchesSearch && matchesDate;
-    });
+    return matchesSearch && matchesDate;
+  });
 }
 
 function displayInvoices(invoices) {
-    const invoiceList = document.getElementById('invoiceList');
+  const invoiceList = document.getElementById('invoiceList');
 
-    if (invoices.length === 0) {
-        invoiceList.innerHTML = '<p>No invoices found.</p>';
-        return;
-    }
+  if (invoices.length === 0) {
+    invoiceList.innerHTML = '<p>No invoices found.</p>';
+    return;
+  }
 
-    invoiceList.innerHTML = invoices.map(invoice => `
-    <div class="invoice-card">
-      <div class="invoice-header">
-        <h3>Invoice #${invoice.invoiceNumber}</h3>
-        <span class="invoice-date">${Utils.formatDate(invoice.date)}</span>
-      </div>
-      <div class="invoice-details">
-        <p><strong>Customer:</strong> ${invoice.customerName}</p>
-        <p><strong>Phone:</strong> ${invoice.customerPhone}</p>
-        <p><strong>Amount:</strong> ₹${Utils.formatCurrency(invoice.grandTotal)}</p>
-      </div>
-      <div class="invoice-actions">
-        <button class="btn-view" onclick="viewInvoice(${invoice.id})">View</button>
-        <button class="btn-edit" onclick="editInvoice(${invoice.id})">Edit</button>
-        <button class="btn-share" onclick="shareInvoice(${invoice.id})">Share</button>
-        <button class="btn-delete" onclick="confirmDelete(${invoice.id}, '${invoice.invoiceNumber}')">Delete</button>
-      </div>
-    </div>
-  `).join('');
+  invoiceList.innerHTML = invoices.map(invoice => `
+        <div class="invoice-card">
+            <div class="invoice-header">
+                <h3>Invoice #${invoice.invoiceNumber}</h3>
+                <span class="invoice-date">${Utils.formatDate(invoice.date)}</span>
+            </div>
+            <div class="invoice-details">
+                <p><strong>Customer:</strong> ${invoice.customerName}</p>
+                <p><strong>Phone:</strong> ${invoice.customerPhone}</p>
+                <p><strong>Amount:</strong> ₹${Utils.formatCurrency(invoice.grandTotal)}</p>
+            </div>
+            <div class="invoice-actions">
+                <button class="btn-view" onclick="viewInvoice(${invoice.id})">View</button>
+                <button class="btn-edit" onclick="editInvoice(${invoice.id})">Edit</button>
+                <button class="btn-share" onclick="shareInvoice(${invoice.id})">Share</button>
+                <button class="btn-delete" onclick="confirmDelete(${invoice.id}, '${invoice.invoiceNumber}')">Delete</button>
+            </div>
+        </div>
+    `).join('');
 }
 
 function clearFilters() {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('dateFrom').value = '';
-    document.getElementById('dateTo').value = '';
-    loadInvoices();
+  document.getElementById('searchInput').value = '';
+  document.getElementById('dateFrom').value = '';
+  document.getElementById('dateTo').value = '';
+  loadInvoices();
 }
+
+
+
+let currentViewModal = null;
 
 async function viewInvoice(id) {
-    const invoice = await invoiceDB.getInvoice(id);
-
-    // Create a view-only version of the invoice
-    const invoiceHTML = generateInvoiceHTML(invoice, true);
-
-    const newWindow = window.open('', '_blank');
-    newWindow.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Invoice ${invoice.invoiceNumber}</title>
-      <link rel="stylesheet" href="css/styles.css">
-    </head>
-    <body>
-      ${invoiceHTML}
-      <script>
-        window.print();
-      </script>
-    </body>
-    </html>
-  `);
-    newWindow.document.close();
+  const invoice = await invoiceDB.getInvoice(id);
+  showInvoiceModal(invoice);
 }
 
-async function editInvoice(id) {
-    const invoice = await invoiceDB.getInvoice(id);
-    const modal = document.getElementById('editInvoiceModal');
-    const form = document.getElementById('editInvoiceForm');
+function showInvoiceModal(invoice) {
+  // Remove existing modal if any
+  if (currentViewModal) {
+    currentViewModal.remove();
+  }
 
-    form.innerHTML = generateEditForm(invoice);
-    modal.style.display = 'block';
+  // Create modal element
+  const modal = document.createElement('div');
+  modal.className = 'modal invoice-view-modal';
+  modal.innerHTML = generateInvoiceModalHTML(invoice);
 
-    // Set up save button
-    document.getElementById('saveEditedInvoice').addEventListener('click', async function () {
-        await saveEditedInvoice(id);
-    });
+  document.body.appendChild(modal);
+  currentViewModal = modal;
+
+  // Show modal
+  modal.style.display = 'block';
+
+  // Add close functionality
+  const closeBtn = modal.querySelector('.close-invoice-modal');
+  closeBtn.addEventListener('click', closeInvoiceModal);
+
+  // Close when clicking outside
+  modal.addEventListener('click', function (e) {
+    if (e.target === modal) {
+      closeInvoiceModal();
+    }
+  });
+
+  // Close with Escape key
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && currentViewModal) {
+      closeInvoiceModal();
+    }
+  });
 }
 
-function generateEditForm(invoice) {
-    return `
-    <form id="invoiceEditForm">
-      <div class="form-group">
-        <label for="editCustomerName">Customer Name:</label>
-        <input type="text" id="editCustomerName" value="${invoice.customerName}">
-      </div>
-      <div class="form-group">
-        <label for="editCustomerPhone">Phone:</label>
-        <input type="text" id="editCustomerPhone" value="${invoice.customerPhone}">
-      </div>
-      <div class="form-group">
-        <label for="editCustomerAddress">Address:</label>
-        <input type="text" id="editCustomerAddress" value="${invoice.customerAddress}">
-      </div>
-      <div class="form-group">
-        <label for="editGrandTotal">Total Amount:</label>
-        <input type="number" id="editGrandTotal" value="${invoice.grandTotal}" step="0.01">
-      </div>
-      <button type="button" id="saveEditedInvoice" class="btn-primary">Save Changes</button>
-    </form>
-  `;
+function closeInvoiceModal() {
+  if (currentViewModal) {
+    currentViewModal.remove();
+    currentViewModal = null;
+  }
 }
 
-async function saveEditedInvoice(id) {
-    const invoice = await invoiceDB.getInvoice(id);
+function generateInvoiceModalHTML(invoice) {
+  return `
+        <div class="modal-content invoice-modal-content">
+            <div class="invoice-modal-header">
+                <h2>Invoice #${invoice.invoiceNumber}</h2>
+                <button class="close-invoice-modal">&times;</button>
+            </div>
+            <div class="invoice-modal-body">
+                <div class="invoice-section">
+                    <h3>Invoice Details</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <label>Invoice Date:</label>
+                            <span>${Utils.formatDate(invoice.date)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Supply Date:</label>
+                            <span>${Utils.formatDate(invoice.supplyDate)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Transport:</label>
+                            <span>${invoice.transportMode || 'N/A'} ${invoice.vehicleNumber ? `(${invoice.vehicleNumber})` : ''}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Place of Supply:</label>
+                            <span>${invoice.placeOfSupply || 'N/A'}</span>
+                        </div>
+                    </div>
+                </div>
 
-    // Update invoice with edited values
-    invoice.customerName = document.getElementById('editCustomerName').value;
-    invoice.customerPhone = document.getElementById('editCustomerPhone').value;
-    invoice.customerAddress = document.getElementById('editCustomerAddress').value;
-    invoice.grandTotal = parseFloat(document.getElementById('editGrandTotal').value);
+                <div class="invoice-section">
+                    <h3>Customer Details</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <label>Name:</label>
+                            <span>${invoice.customerName}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Phone:</label>
+                            <span>${invoice.customerPhone}</span>
+                        </div>
+                        <div class="detail-item full-width">
+                            <label>Address:</label>
+                            <span>${invoice.customerAddress}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>State:</label>
+                            <span>${invoice.state} (Code: ${invoice.stateCode})</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>GSTIN:</label>
+                            <span>${invoice.customerGSTIN || 'N/A'}</span>
+                        </div>
+                    </div>
+                </div>
 
-    await invoiceDB.saveInvoice(invoice);
+                <div class="invoice-section">
+                    <h3>Products & Services</h3>
+                    <table class="invoice-products-table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>HSN Code</th>
+                                <th>Qty</th>
+                                <th>Rate</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${invoice.products.map(product => `
+                                <tr>
+                                    <td>${product.description}</td>
+                                    <td>${product.hsnCode || 'N/A'}</td>
+                                    <td>${product.qty}</td>
+                                    <td>₹${Utils.formatCurrency(product.rate)}</td>
+                                    <td>₹${Utils.formatCurrency(product.amount)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
 
-    document.getElementById('editInvoiceModal').style.display = 'none';
-    loadInvoices();
-    alert('Invoice updated successfully!');
+                <div class="invoice-section">
+                    <h3>Tax Calculation</h3>
+                    <div class="tax-calculation-grid">
+                        <div class="tax-row">
+                            <label>Sub Total:</label>
+                            <span>₹${Utils.formatCurrency(invoice.subTotal)}</span>
+                        </div>
+                        ${invoice.cgstRate > 0 ? `
+                        <div class="tax-row">
+                            <label>CGST (${invoice.cgstRate}%):</label>
+                            <span>₹${Utils.formatCurrency(invoice.cgstAmount)}</span>
+                        </div>
+                        ` : ''}
+                        ${invoice.sgstRate > 0 ? `
+                        <div class="tax-row">
+                            <label>SGST (${invoice.sgstRate}%):</label>
+                            <span>₹${Utils.formatCurrency(invoice.sgstAmount)}</span>
+                        </div>
+                        ` : ''}
+                        ${invoice.igstRate > 0 ? `
+                        <div class="tax-row">
+                            <label>IGST (${invoice.igstRate}%):</label>
+                            <span>₹${Utils.formatCurrency(invoice.igstAmount)}</span>
+                        </div>
+                        ` : ''}
+                        <div class="tax-row">
+                            <label>Total Tax Amount:</label>
+                            <span>₹${Utils.formatCurrency(invoice.totalTaxAmount)}</span>
+                        </div>
+                        <div class="tax-row">
+                            <label>Round Off:</label>
+                            <span>₹${Utils.formatCurrency(invoice.roundOff)}</span>
+                        </div>
+                        <div class="tax-row grand-total">
+                            <label>Grand Total:</label>
+                            <span>₹${Utils.formatCurrency(invoice.grandTotal)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="invoice-section">
+                    <h3>Amount in Words</h3>
+                    <div class="amount-words">
+                        ${invoice.amountInWords}
+                    </div>
+                </div>
+
+                <div class="invoice-section">
+                    <h3>Bank Details</h3>
+                    <div class="bank-details-grid">
+                        <div class="bank-item">
+                            <label>Account Name:</label>
+                            <span>RSK ENTERPRISES</span>
+                        </div>
+                        <div class="bank-item">
+                            <label>Bank Name:</label>
+                            <span>CANARA BANK</span>
+                        </div>
+                        <div class="bank-item">
+                            <label>Account Number:</label>
+                            <span>120033201829</span>
+                        </div>
+                        <div class="bank-item">
+                            <label>IFSC Code:</label>
+                            <span>CNRBOO16563</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="invoice-modal-footer">
+                <button class="btn-print" onclick="printInvoice(${invoice.id})">Print</button>
+                <button class="btn-close" onclick="closeInvoiceModal()">Close</button>
+            </div>
+        </div>
+    `;
+}
+
+function printInvoice(invoiceId) {
+  // You can implement print functionality here
+  window.print();
+}
+function generateInvoicePreviewHTML(invoice) {
+  return `
+        <div class="preview-content">
+            <div class="preview-header">
+                <h4>Invoice #${invoice.invoiceNumber}</h4>
+                <span>${Utils.formatDate(invoice.date)}</span>
+            </div>
+            <div class="preview-details">
+                <p><strong>Customer:</strong> ${invoice.customerName}</p>
+                <p><strong>Phone:</strong> ${invoice.customerPhone}</p>
+                <p><strong>Address:</strong> ${invoice.customerAddress}</p>
+                <p><strong>GSTIN:</strong> ${invoice.customerGSTIN || 'N/A'}</p>
+            </div>
+            <div class="preview-products">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th>Rate</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${invoice.products.map(product => `
+                            <tr>
+                                <td>${product.description}</td>
+                                <td>${product.qty}</td>
+                                <td>₹${Utils.formatCurrency(product.rate)}</td>
+                                <td>₹${Utils.formatCurrency(product.amount)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            <div class="preview-totals">
+                <p><strong>Subtotal:</strong> ₹${Utils.formatCurrency(invoice.subTotal)}</p>
+                <p><strong>CGST (${invoice.cgstRate}%):</strong> ₹${Utils.formatCurrency(invoice.cgstAmount)}</p>
+                <p><strong>SGST (${invoice.sgstRate}%):</strong> ₹${Utils.formatCurrency(invoice.sgstAmount)}</p>
+                ${invoice.igstRate > 0 ? `<p><strong>IGST (${invoice.igstRate}%):</strong> ₹${Utils.formatCurrency(invoice.igstAmount)}</p>` : ''}
+                <p><strong>Grand Total:</strong> ₹${Utils.formatCurrency(invoice.grandTotal)}</p>
+            </div>
+        </div>
+    `;
+}
+
+function editInvoice(id) {
+  // Navigate to main page with edit parameter
+  window.location.href = `index.html?edit=${id}`;
 }
 
 function confirmDelete(id, invoiceNumber) {
-    const modal = document.getElementById('deleteModal');
-    document.getElementById('invoiceToDelete').textContent = invoiceNumber;
-    document.getElementById('confirmInvoiceNumber').value = '';
-    modal.style.display = 'block';
+  const modal = document.getElementById('deleteModal');
+  document.getElementById('invoiceToDelete').textContent = invoiceNumber;
+  document.getElementById('confirmInvoiceNumber').value = '';
+  modal.style.display = 'block';
 
-    // Set up delete confirmation
-    document.getElementById('confirmDelete').onclick = function () {
-        const enteredNumber = document.getElementById('confirmInvoiceNumber').value;
+  // Set up delete confirmation
+  document.getElementById('confirmDelete').onclick = function () {
+    const enteredNumber = document.getElementById('confirmInvoiceNumber').value;
 
-        if (enteredNumber === invoiceNumber) {
-            deleteInvoice(id);
-        } else {
-            alert('Invoice number does not match. Please try again.');
-        }
-    };
+    if (enteredNumber === invoiceNumber) {
+      deleteInvoice(id);
+    } else {
+      alert('Invoice number does not match. Please try again.');
+    }
+  };
 
-    document.getElementById('cancelDelete').onclick = function () {
-        modal.style.display = 'none';
-    };
+  document.getElementById('cancelDelete').onclick = function () {
+    modal.style.display = 'none';
+  };
 }
 
 async function deleteInvoice(id) {
-    await invoiceDB.deleteInvoice(id);
-    document.getElementById('deleteModal').style.display = 'none';
-    loadInvoices();
-    alert('Invoice moved to recycle bin.');
+  await invoiceDB.deleteInvoice(id);
+  document.getElementById('deleteModal').style.display = 'none';
+  loadInvoices();
+  alert('Invoice moved to recycle bin.');
 }
 
 async function shareInvoice(id) {
+  try {
     const invoice = await invoiceDB.getInvoice(id);
 
-    const message = `Invoice #${invoice.invoiceNumber}
-  
-Customer: ${invoice.customerName}
-Date: ${Utils.formatDate(invoice.date)}
-Total Amount: ₹${Utils.formatCurrency(invoice.grandTotal)}
+    // Show sharing options
+    const shareOption = confirm('Choose sharing format:\n\nOK - Professional Format (Detailed)\nCancel - Simple Format (Mobile Friendly)');
 
-Thank you for your business!
-RSK ENTERPRISES`;
-
-    Utils.shareOnWhatsApp(invoice.customerPhone, message);
-}
-
-function generateInvoiceHTML(invoice, isViewOnly = false) {
-    // This would generate the HTML for the invoice similar to index.html
-    // Implementation would be similar to the invoice structure in index.html
-    // but with the data from the invoice object
-    return `
-    <div class="invoice-container">
-      <!-- Invoice HTML structure with invoice data -->
-    </div>
-  `;
+    if (shareOption) {
+      // Professional format
+      await Utils.shareCompleteInvoice(invoice);
+    } else {
+      // Simple format
+      const simpleMessage = Utils.generateSimpleInvoiceMessage(invoice);
+      Utils.shareOnWhatsApp(invoice.customerPhone, simpleMessage);
+    }
+  } catch (error) {
+    console.error('Error sharing invoice:', error);
+    alert('Error sharing invoice. Please try again.');
+  }
 }

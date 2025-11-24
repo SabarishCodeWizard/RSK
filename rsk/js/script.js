@@ -8,9 +8,18 @@ document.addEventListener('DOMContentLoaded', async function () {
     document.getElementById('invoiceDate').value = today;
     document.getElementById('supplyDate').value = today;
 
-    // Generate invoice number
-    const invoiceNumber = await Utils.generateInvoiceNumber();
-    document.getElementById('invoiceNo').value = invoiceNumber;
+    // Check if we're editing an existing invoice
+    const urlParams = new URLSearchParams(window.location.search);
+    const editInvoiceId = urlParams.get('edit');
+    
+    if (editInvoiceId) {
+        await loadInvoiceForEdit(editInvoiceId);
+    } else {
+        // Set default tax rates for new invoice
+        document.getElementById('cgstRate').value = 9;
+        document.getElementById('sgstRate').value = 9;
+        document.getElementById('igstRate').value = 0;
+    }
 
     // Auto-fill customer details on phone number input
     document.getElementById('customerPhone').addEventListener('blur', async function () {
@@ -59,6 +68,8 @@ document.addEventListener('DOMContentLoaded', async function () {
 
                 if (matchedShortcut) {
                     e.target.value = matchedShortcut.description;
+                    // Focus on next field
+                    e.target.closest('tr').querySelector('.hsn-code').focus();
                 }
             }
         }
@@ -115,9 +126,64 @@ document.addEventListener('DOMContentLoaded', async function () {
         window.location.href = 'login.html';
     });
 
-    // Initialize with one row
-    addProductRow();
+    // Initialize with one row if no existing invoice
+    if (!editInvoiceId) {
+        addProductRow();
+    }
 });
+
+async function loadInvoiceForEdit(invoiceId) {
+    try {
+        const invoice = await invoiceDB.getInvoice(parseInt(invoiceId));
+        
+        if (invoice) {
+            // Fill basic invoice details
+            document.getElementById('invoiceNo').value = invoice.invoiceNumber;
+            document.getElementById('invoiceDate').value = invoice.date;
+            document.getElementById('customerPhone').value = invoice.customerPhone;
+            document.getElementById('customerName').value = invoice.customerName;
+            document.getElementById('customerAddress').value = invoice.customerAddress;
+            document.getElementById('customerGSTIN').value = invoice.customerGSTIN;
+            document.getElementById('state').value = invoice.state;
+            document.getElementById('stateCode').value = invoice.stateCode;
+            document.getElementById('transportMode').value = invoice.transportMode;
+            document.getElementById('vehicleNumber').value = invoice.vehicleNumber;
+            document.getElementById('supplyDate').value = invoice.supplyDate;
+            document.getElementById('placeOfSupply').value = invoice.placeOfSupply;
+            document.getElementById('reverseCharge').value = invoice.reverseCharge;
+            
+            // Fill tax rates
+            document.getElementById('cgstRate').value = invoice.cgstRate;
+            document.getElementById('sgstRate').value = invoice.sgstRate;
+            document.getElementById('igstRate').value = invoice.igstRate;
+            
+            // Clear existing rows
+            document.getElementById('productTableBody').innerHTML = '';
+            
+            // Add product rows
+            invoice.products.forEach((product, index) => {
+                addProductRow();
+                const rows = document.querySelectorAll('#productTableBody tr');
+                const currentRow = rows[rows.length - 1];
+                
+                currentRow.querySelector('.product-description').value = product.description;
+                currentRow.querySelector('.hsn-code').value = product.hsnCode;
+                currentRow.querySelector('.qty').value = product.qty;
+                currentRow.querySelector('.rate').value = product.rate;
+                
+                calculateRowAmount(currentRow);
+            });
+            
+            calculateTotals();
+            
+            // Update button text for edit mode
+            document.getElementById('saveBill').innerHTML = '<i class="fas fa-save"></i> Update Bill';
+        }
+    } catch (error) {
+        console.error('Error loading invoice for edit:', error);
+        alert('Error loading invoice data.');
+    }
+}
 
 function addProductRow() {
     const tbody = document.getElementById('productTableBody');
@@ -125,15 +191,15 @@ function addProductRow() {
 
     const row = document.createElement('tr');
     row.innerHTML = `
-    <td>${rowCount}</td>
-    <td><input type="text" class="product-description"></td>
-    <td><input type="text" class="hsn-code"></td>
-    <td><input type="number" class="qty" value="0"></td>
-    <td><input type="number" class="rate" value="0.00" step="0.01"></td>
-    <td class="amount">0.00</td>
-    <td class="taxable-value">0.00</td>
-    <td><button class="remove-row">X</button></td>
-  `;
+        <td>${rowCount}</td>
+        <td><input type="text" class="product-description"></td>
+        <td><input type="text" class="hsn-code"></td>
+        <td><input type="number" class="qty" value="0"></td>
+        <td><input type="number" class="rate" value="0.00" step="0.01"></td>
+        <td class="amount">0.00</td>
+        <td class="taxable-value">0.00</td>
+        <td><button type="button" class="remove-row">X</button></td>
+    `;
 
     tbody.appendChild(row);
 }
@@ -188,11 +254,27 @@ function calculateTotals() {
 }
 
 async function saveBill() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const editInvoiceId = urlParams.get('edit');
+    
     const invoiceData = collectInvoiceData();
+    
+    // If editing, preserve the original ID
+    if (editInvoiceId) {
+        invoiceData.id = parseInt(editInvoiceId);
+    }
 
     try {
         await invoiceDB.saveInvoice(invoiceData);
-        alert('Bill saved successfully!');
+        
+        if (editInvoiceId) {
+            alert('Bill updated successfully!');
+        } else {
+            alert('Bill saved successfully!');
+        }
+        
+        // Redirect to history page after save
+        window.location.href = 'invoice-history.html';
     } catch (error) {
         console.error('Error saving bill:', error);
         alert('Error saving bill. Please try again.');
@@ -239,7 +321,8 @@ function collectInvoiceData() {
         roundOff: parseFloat(document.getElementById('roundOff').textContent) || 0,
         grandTotal: parseFloat(document.getElementById('grandTotal').textContent) || 0,
         amountInWords: document.getElementById('amountInWords').textContent,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
     };
 }
 
@@ -267,9 +350,12 @@ function resetForm() {
         // Reset calculations
         calculateTotals();
 
-        // Generate new invoice number
-        Utils.generateInvoiceNumber().then(invoiceNumber => {
-            document.getElementById('invoiceNo').value = invoiceNumber;
-        });
+        // Reset button text if it was in edit mode
+        document.getElementById('saveBill').innerHTML = '<i class="fas fa-save"></i> Save BILL';
+        
+        // Remove edit parameter from URL
+        if (window.location.search.includes('edit')) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
     }
 }
