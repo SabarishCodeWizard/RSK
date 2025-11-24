@@ -363,51 +363,215 @@ function editInvoice(id) {
 }
 
 function confirmDelete(id, invoiceNumber) {
-  const modal = document.getElementById('deleteModal');
-  document.getElementById('invoiceToDelete').textContent = invoiceNumber;
-  document.getElementById('confirmInvoiceNumber').value = '';
-  modal.style.display = 'block';
+    const modal = document.getElementById('deleteModal');
+    document.getElementById('invoiceToDelete').textContent = invoiceNumber;
+    document.getElementById('confirmInvoiceNumber').value = '';
+    modal.style.display = 'block';
 
-  // Set up delete confirmation
-  document.getElementById('confirmDelete').onclick = function () {
-    const enteredNumber = document.getElementById('confirmInvoiceNumber').value;
+    const confirmInput = document.getElementById('confirmInvoiceNumber');
+    const confirmBtn = document.getElementById('confirmDelete');
 
-    if (enteredNumber === invoiceNumber) {
-      deleteInvoice(id);
-    } else {
-      alert('Invoice number does not match. Please try again.');
+    // Enable/disable button based on input
+    function validateInput() {
+        const enteredNumber = confirmInput.value.trim();
+        const isValid = enteredNumber === invoiceNumber;
+        
+        confirmBtn.disabled = !isValid;
+        
+        if (enteredNumber && !isValid) {
+            confirmInput.classList.add('error');
+        } else {
+            confirmInput.classList.remove('error');
+        }
     }
-  };
 
-  document.getElementById('cancelDelete').onclick = function () {
-    modal.style.display = 'none';
-  };
+    // Real-time validation
+    confirmInput.addEventListener('input', validateInput);
+    
+    // Enter key support
+    confirmInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !confirmBtn.disabled) {
+            deleteInvoice(id);
+        }
+    });
+
+    // Set up delete confirmation
+    confirmBtn.onclick = function () {
+        if (!confirmBtn.disabled) {
+            deleteInvoice(id);
+        }
+    };
+
+    document.getElementById('cancelDelete').onclick = function () {
+        modal.style.display = 'none';
+    };
+
+    // Focus on input field
+    setTimeout(() => {
+        confirmInput.focus();
+    }, 100);
 }
 
 async function deleteInvoice(id) {
-  await invoiceDB.deleteInvoice(id);
-  document.getElementById('deleteModal').style.display = 'none';
-  loadInvoices();
-  alert('Invoice moved to recycle bin.');
+    try {
+        await invoiceDB.deleteInvoice(id);
+        document.getElementById('deleteModal').style.display = 'none';
+        
+        // Show temporary success message
+        const successMsg = document.createElement('div');
+        successMsg.className = 'success-message';
+        successMsg.innerHTML = '<i class="fas fa-check-circle"></i> Invoice successfully moved to Recycle Bin';
+        successMsg.style.position = 'fixed';
+        successMsg.style.top = '20px';
+        successMsg.style.right = '20px';
+        successMsg.style.zIndex = '1000';
+        successMsg.style.padding = '15px 20px';
+        successMsg.style.borderRadius = '6px';
+        successMsg.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        
+        document.body.appendChild(successMsg);
+        
+        // Remove success message after 3 seconds
+        setTimeout(() => {
+            if (successMsg.parentNode) {
+                successMsg.parentNode.removeChild(successMsg);
+            }
+        }, 3000);
+        
+        loadInvoices();
+    } catch (error) {
+        console.error('Error deleting invoice:', error);
+        alert('Error moving invoice to recycle bin. Please try again.');
+    }
+}
+async function shareInvoice(id) {
+    try {
+        const invoice = await invoiceDB.getInvoice(id);
+        showShareModal(invoice);
+    } catch (error) {
+        console.error('Error sharing invoice:', error);
+        showSuccessToast('Error sharing invoice. Please try again.', 'error');
+    }
 }
 
-async function shareInvoice(id) {
-  try {
-    const invoice = await invoiceDB.getInvoice(id);
-
-    // Show sharing options
-    const shareOption = confirm('Choose sharing format:\n\nOK - Professional Format (Detailed)\nCancel - Simple Format (Mobile Friendly)');
-
-    if (shareOption) {
-      // Professional format
-      await Utils.shareCompleteInvoice(invoice);
-    } else {
-      // Simple format
-      const simpleMessage = Utils.generateSimpleInvoiceMessage(invoice);
-      Utils.shareOnWhatsApp(invoice.customerPhone, simpleMessage);
+function showShareModal(invoice) {
+    // Remove existing modal if any
+    const existingModal = document.getElementById('shareInvoiceModal');
+    if (existingModal) {
+        existingModal.remove();
     }
-  } catch (error) {
-    console.error('Error sharing invoice:', error);
-    alert('Error sharing invoice. Please try again.');
-  }
+
+    // Create modal element
+    const modal = document.createElement('div');
+    modal.id = 'shareInvoiceModal';
+    modal.className = 'modal share-invoice-modal';
+    modal.innerHTML = generateShareModalHTML(invoice);
+
+    document.body.appendChild(modal);
+
+    // Show modal
+    modal.style.display = 'block';
+
+    // Add event listeners
+    const closeBtn = modal.querySelector('.close-share-modal');
+    closeBtn.addEventListener('click', closeShareModal);
+
+    // Share option buttons
+    modal.querySelector('#shareProfessional').addEventListener('click', function() {
+        Utils.shareCompleteInvoice(invoice);
+        closeShareModal();
+    });
+
+    modal.querySelector('#shareSimple').addEventListener('click', function() {
+        const simpleMessage = Utils.generateSimpleInvoiceMessage(invoice);
+        Utils.shareOnWhatsApp(invoice.customerPhone, simpleMessage);
+        closeShareModal();
+    });
+
+    // Close when clicking outside
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeShareModal();
+        }
+    });
+
+    // Close with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal) {
+            closeShareModal();
+        }
+    });
+}
+
+function closeShareModal() {
+    const modal = document.getElementById('shareInvoiceModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function generateShareModalHTML(invoice) {
+    return `
+        <div class="modal-content share-modal-content">
+            <div class="share-modal-header">
+                <h2>Share Invoice</h2>
+                <button class="close-share-modal">&times;</button>
+            </div>
+            <div class="share-modal-body">
+                <div class="share-preview">
+                    <div class="preview-header">
+                        <h4>#${invoice.invoiceNumber}</h4>
+                        <span class="preview-date">${Utils.formatDate(invoice.date)}</span>
+                    </div>
+                    <div class="preview-customer">
+                        <p><strong>${invoice.customerName}</strong></p>
+                        <p>₹${Utils.formatCurrency(invoice.grandTotal)}</p>
+                    </div>
+                </div>
+
+                <div class="share-options">
+                    <div class="share-option-card" data-option="professional">
+                        <div class="option-header">
+                            <i class="fas fa-file-invoice"></i>
+                            <div class="option-info">
+                                <h5>Professional</h5>
+                                <p>Complete details with taxes</p>
+                            </div>
+                        </div>
+                        <ul class="option-features">
+                            <li><i class="fas fa-check"></i> Full business info</li>
+                            <li><i class="fas fa-check"></i> Tax breakdown</li>
+                            <li><i class="fas fa-check"></i> Bank details</li>
+                        </ul>
+                        <button id="shareProfessional" class="btn-share-option">
+                            <i class="fab fa-whatsapp"></i> Share
+                        </button>
+                    </div>
+
+                    <div class="share-option-card" data-option="simple">
+                        <div class="option-header">
+                            <i class="fas fa-mobile-alt"></i>
+                            <div class="option-info">
+                                <h5>Simple</h5>
+                                <p>Quick mobile summary</p>
+                            </div>
+                        </div>
+                        <ul class="option-features">
+                            <li><i class="fas fa-check"></i> Essential info</li>
+                            <li><i class="fas fa-check"></i> Mobile optimized</li>
+                            <li><i class="fas fa-check"></i> Fast loading</li>
+                        </ul>
+                        <button id="shareSimple" class="btn-share-option">
+                            <i class="fab fa-whatsapp"></i> Share
+                        </button>
+                    </div>
+                </div>
+
+                <div class="share-info">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Sharing with: <strong>${invoice.customerName}</strong> (${invoice.customerPhone})</p>
+                </div>
+            </div>
+        </div>
+    `;
 }

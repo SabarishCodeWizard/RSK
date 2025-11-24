@@ -66,20 +66,32 @@
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3>Confirm Deletion</h3>
-            <p>To delete this invoice, please type the invoice number: <strong id="invoiceToDelete"></strong></p>
-            <input type="text" id="confirmInvoiceNumber" placeholder="Enter invoice number">
-            <div class="modal-actions">
-                <button id="confirmDelete" class="btn-danger">Delete</button>
-                <button id="cancelDelete">Cancel</button>
-            </div>
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>Confirm Deletion</h3>
+        
+        <div class="warning-info">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>
+                <strong>Warning:</strong> This action will move the invoice to Recycle Bin. 
+                You can restore it within 30 days before permanent deletion.
+            </p>
+        </div>
+        
+        <p>To confirm deletion, please type the invoice number: <strong id="invoiceToDelete"></strong></p>
+        
+        <input type="text" id="confirmInvoiceNumber" placeholder="Enter invoice number to confirm">
+        
+        <div class="modal-actions">
+            <button id="cancelDelete">Cancel</button>
+            <button id="confirmDelete" class="btn-danger" disabled>
+                <i class="fas fa-trash"></i> Move to Recycle Bin
+            </button>
         </div>
     </div>
-
+</div>
     <script src="js/db.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/invoice-history.js"></script>

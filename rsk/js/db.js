@@ -107,6 +107,31 @@ class InvoiceDB {
         return this.delete(STORES.PRODUCT_SHORTCUTS, shortcut);
     }
 
+    // NEW METHOD: Update shortcut (delete old and create new)
+    async updateShortcut(oldShortcutKey, newShortcut) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const transaction = this.db.transaction([STORES.PRODUCT_SHORTCUTS], 'readwrite');
+                const store = transaction.objectStore(STORES.PRODUCT_SHORTCUTS);
+                
+                // If the shortcut key is changing, we need to delete the old one first
+                if (oldShortcutKey !== newShortcut.shortcut) {
+                    // Delete the old shortcut
+                    const deleteRequest = store.delete(oldShortcutKey);
+                    deleteRequest.onerror = () => reject(deleteRequest.error);
+                }
+                
+                // Add the new/updated shortcut
+                const addRequest = store.put(newShortcut);
+                addRequest.onerror = () => reject(addRequest.error);
+                addRequest.onsuccess = () => resolve(addRequest.result);
+                
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
     // Settings operations
     async saveSetting(key, value) {
         return this.addOrUpdate(STORES.SETTINGS, { key, value });

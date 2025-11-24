@@ -51,6 +51,97 @@
         </div>
     </div>
 
+
+    <!-- Restore Confirmation Modal -->
+<div id="restoreModal" class="confirmation-modal restore-modal">
+    <div class="confirmation-modal-content">
+        <div class="modal-header">
+            <i class="fas fa-trash-restore fa-lg"></i>
+            <h3>Restore Invoice</h3>
+        </div>
+        <div class="modal-body">
+            <p class="modal-message">Are you sure you want to restore this invoice? It will be moved back to your active invoices.</p>
+            
+            <div class="invoice-info">
+                <div class="info-row">
+                    <span class="info-label">Invoice Number:</span>
+                    <span class="info-value" id="restoreInvoiceNumber">--</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Customer:</span>
+                    <span class="info-value" id="restoreCustomerName">--</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Amount:</span>
+                    <span class="info-value" id="restoreInvoiceAmount">--</span>
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <i class="fas fa-info-circle"></i>
+                <p class="warning-text">
+                    <strong>Note:</strong> Type "RESTORE" to confirm restoration of this invoice.
+                </p>
+            </div>
+            
+            <input type="text" id="restoreConfirmInput" class="confirmation-input" placeholder="Type RESTORE to confirm">
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-cancel" id="cancelRestore">Cancel</button>
+            <button class="modal-btn modal-btn-confirm" id="confirmRestore" disabled>
+                <i class="fas fa-trash-restore"></i> Restore Invoice
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Permanently Confirmation Modal -->
+<div id="deleteModal" class="confirmation-modal delete-modal">
+    <div class="confirmation-modal-content">
+        <div class="modal-header">
+            <i class="fas fa-fire-alt fa-lg"></i>
+            <h3>Delete Permanently</h3>
+        </div>
+        <div class="modal-body">
+            <p class="modal-message">This action cannot be undone. The invoice will be permanently deleted from the system.</p>
+            
+            <div class="invoice-info">
+                <div class="info-row">
+                    <span class="info-label">Invoice Number:</span>
+                    <span class="info-value" id="deleteInvoiceNumber">--</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Customer:</span>
+                    <span class="info-value" id="deleteCustomerName">--</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Amount:</span>
+                    <span class="info-value" id="deleteInvoiceAmount">--</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Deleted On:</span>
+                    <span class="info-value" id="deleteInvoiceDate">--</span>
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p class="warning-text">
+                    <strong>Warning:</strong> This is a permanent deletion. Type "DELETE" to confirm permanent removal.
+                </p>
+            </div>
+            
+            <input type="text" id="deleteConfirmInput" class="confirmation-input" placeholder="Type DELETE to confirm">
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-cancel" id="cancelDelete">Cancel</button>
+            <button class="modal-btn modal-btn-confirm" id="confirmDelete" disabled>
+                <i class="fas fa-fire-alt"></i> Delete Permanently
+            </button>
+        </div>
+    </div>
+</div>
+
     <script src="js/db.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/recycle-bin.js"></script>

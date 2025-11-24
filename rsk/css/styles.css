@@ -2,7 +2,7 @@
 
 /* --- GENERAL STYLES AND VARIABLES (Consistent across all pages) --- */
 :root {
-    --primary-color: #007bff; /* Blue for primary actions/branding */
+    --primary-color: #343a40; /* Blue for primary actions/branding */
     --secondary-color: #6c757d; /* Gray for secondary elements */
     --success-color: #28a745; /* Green for save/generate */
     --danger-color: #dc3545; /* Red for delete/logout */
@@ -38,12 +38,11 @@ body {
     width: 100%;
 }
 
-/* Make the sidebar and content children of the body, then wrap content in a div */
 .container {
     display: flex;
-    flex-grow: 1; /* Allow content to fill the remaining space */
+    width: 100%;
+    min-height: 100vh;
 }
-
 /* --- SIDEBAR (Controls) - Reused from previous pages --- */
 .controls {
     width: 250px;
@@ -55,7 +54,29 @@ body {
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     position: sticky;
     top: 0;
-    height: 100vh; /* Make sidebar full height */
+    height: 100vh;
+    flex-shrink: 0;
+}
+
+
+.content {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    background-color: var(--bg-light);
+    min-height: 100vh;
+}
+
+.invoice-container {
+    width: 100%;
+    max-width: 900px;
+    background-color: var(--bg-white);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 0 auto; /* Ensure centering */
 }
 
 .bill-system-header {
@@ -67,7 +88,7 @@ body {
 
 .brand-name {
     display: block;
-    color: var(--primary-color);
+    color: var(--bg-white);
     font-size: 1.5rem;
     font-weight: 700;
     text-decoration: none;
@@ -77,7 +98,7 @@ body {
 .system-name {
     display: block;
     font-size: 0.8rem;
-    color: var(--secondary-color);
+    color: var(--bg-white);
     letter-spacing: 1px;
 }
 
@@ -106,7 +127,7 @@ body {
 }
 
 .dashboard {
-    background-color: var(--primary-color);
+    background-color:  #0056b3;
     font-weight: 600;
     color: var(--bg-white);
 }
@@ -117,7 +138,7 @@ body {
 
 .view-history-btn:hover {
     background-color: rgba(255, 255, 255, 0.1);
-    color: var(--primary-color);
+    color: var(--bg-white);
 }
 
 #logoutBtn {
@@ -168,15 +189,21 @@ body {
 }
 #resetForm:hover { background-color: #5a6268; }
 
-/* --- INVOICE CONTENT AREA --- */
+/* ================================================= */
+/* --- INVOICE CONTENT AREA (Updated) --- */
+/* ================================================= */
 .invoice-container {
     flex-grow: 1;
-    max-width: 900px; /* Standard A4 width for the invoice area */
-    margin: 30px auto;
-    padding: 30px;
+    max-width: 900px;
+    /* Standard A4 width for the invoice area */
+    margin: 20px auto;
+    /* Reduced margin */
+    padding: 20px;
+    /* Reduced padding */
     background-color: var(--bg-white);
-    border: 1px solid var(--border-light);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    /* **REMOVED** border and box-shadow for a clean look */
+    /* border: 1px solid var(--border-light); */
+    /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); */
     border-radius: 8px;
 }
 
@@ -185,8 +212,8 @@ body {
     display: flex;
     justify-content: space-between;
     border-bottom: 2px solid var(--primary-color);
-    padding-bottom: 15px;
-    margin-bottom: 20px;
+    padding-bottom: 10px; /* Reduced padding */
+    margin-bottom: 15px; /* Reduced margin */
 }
 
 .company-details h2 {
@@ -225,22 +252,22 @@ body {
 }
 
 .invoice-number input, .invoice-date input {
-    padding: 8px;
+    padding: 6px; /* Slightly reduced padding */
     border: 1px solid var(--border-light);
     border-radius: 4px;
-    font-size: 1rem;
+    font-size: 0.9rem; /* Slightly reduced font size */
     text-align: right;
-    width: 150px;
+    width: 130px; /* Reduced width */
 }
 
-/* --- BILLING / SHIPPING INFO --- */
+/* --- BILLING / SHIPPING INFO (Compacted) --- */
 .billing-info {
     display: flex;
     justify-content: space-between;
     gap: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 20px; /* Reduced margin */
     border: 1px solid var(--border-light);
-    padding: 15px;
+    padding: 10px; /* Reduced padding */
     border-radius: 4px;
 }
 
@@ -250,46 +277,47 @@ body {
 
 .bill-to h3 {
     border-bottom: 1px solid var(--border-light);
-    padding-bottom: 8px;
-    margin-bottom: 15px;
+    padding-bottom: 5px; /* Reduced padding */
+    margin-bottom: 10px; /* Reduced margin */
     color: var(--primary-color);
     font-size: 1.1rem;
 }
 
 .shipping-info .form-group {
-    /* Smaller form groups for shipping details */
-    margin-bottom: 8px;
+    margin-bottom: 6px; /* More compact */
 }
 
 .form-group {
-    margin-bottom: 10px;
+    margin-bottom: 8px; /* Reduced margin */
 }
 
 .form-group label {
     font-size: 0.85rem;
     font-weight: 500;
-    min-width: 120px;
+    min-width: 110px; /* Tighter label width */
     display: inline-block;
 }
 
 .form-group input[type="text"],
 .form-group input[type="date"],
 .form-group select {
-    padding: 6px;
+    padding: 4px; /* Reduced padding */
     border: 1px solid var(--border-light);
     border-radius: 3px;
-    font-size: 0.9rem;
-    width: calc(100% - 130px); /* Adjust width relative to label width */
-    max-width: 250px;
+    font-size: 0.85rem; /* Reduced font size */
+    /* Set a fixed max-width for uniformity and visibility */
+    max-width: 250px; 
+    /* Use calc(100% - fixed width) for responsiveness in flex container */
+    width: calc(100% - 120px); 
 }
 
 .bill-to .form-group input[type="text"],
 .bill-to .form-group select {
-    width: calc(100% - 130px);
+    width: calc(100% - 120px);
 }
 
 .short-input {
-    width: 50px !important;
+    width: 40px !important; /* Made smaller for State Code */
     text-align: center;
 }
 
@@ -302,9 +330,9 @@ body {
     margin-left: 10px;
 }
 
-/* --- PRODUCT TABLE --- */
+/* --- PRODUCT TABLE (Compacted) --- */
 .product-table-container {
-    margin-bottom: 30px;
+    margin-bottom: 20px; /* Reduced margin */
     overflow-x: auto;
 }
 
@@ -312,19 +340,20 @@ body {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.95rem;
-    margin-bottom: 15px;
+    margin-bottom: 10px; /* Reduced margin */
 }
 
 #productTable thead th {
     background-color: var(--primary-color);
     color: white;
-    padding: 12px 8px;
+    padding: 8px 5px; /* Reduced padding for compactness */
     text-align: left;
     border: 1px solid var(--primary-color);
+    font-size: 0.9rem;
 }
 
 #productTable tbody td {
-    padding: 8px;
+    padding: 5px; /* Reduced padding for compactness */
     border: 1px solid var(--border-light);
     vertical-align: middle;
 }
@@ -337,10 +366,10 @@ body {
 #productTable input[type="text"],
 #productTable input[type="number"] {
     width: 100%;
-    padding: 6px;
+    padding: 3px; /* Reduced padding */
     border: 1px solid var(--border-light);
     border-radius: 3px;
-    font-size: 0.9rem;
+    font-size: 0.85rem; /* Reduced font size */
     text-align: right;
 }
 
@@ -353,16 +382,18 @@ body {
     text-align: right;
     min-width: 80px;
     color: var(--text-dark);
+    font-size: 0.85rem; /* Ensure numbers are clearly visible */
 }
 
 .remove-row {
     background-color: var(--danger-color);
     color: white;
     border: none;
-    padding: 5px 10px;
+    padding: 3px 8px; /* Smaller button */
     border-radius: 3px;
     cursor: pointer;
     font-weight: bold;
+    font-size: 0.8rem;
     transition: background-color 0.2s;
 }
 .remove-row:hover { background-color: #c82333; }
@@ -371,48 +402,50 @@ body {
     background-color: var(--primary-color);
     color: white;
     border: none;
-    padding: 8px 15px;
+    padding: 6px 12px; /* Smaller button */
     border-radius: 4px;
     cursor: pointer;
     font-weight: 500;
+    font-size: 0.9rem;
     transition: background-color 0.2s;
 }
 #addRow:hover { background-color: #0056b3; }
 
-/* --- CALCULATION AND BANK SECTION --- */
+/* --- CALCULATION AND BANK SECTION (Compacted) --- */
 .calculation-section {
     display: flex;
     justify-content: space-between;
-    gap: 30px;
-    margin-bottom: 30px;
+    gap: 20px; /* Reduced gap */
+    margin-bottom: 20px; /* Reduced margin */
 }
 
 .tax-calculation {
     flex: 2;
     border: 1px solid var(--border-light);
-    padding: 15px;
+    padding: 10px; /* Reduced padding */
     border-radius: 4px;
 }
 
 .bank-details {
     flex: 1;
     border: 1px solid var(--border-light);
-    padding: 15px;
+    padding: 10px; /* Reduced padding */
     border-radius: 4px;
 }
 
 .bank-details h3 {
     color: var(--primary-color);
     border-bottom: 1px solid var(--border-light);
-    padding-bottom: 8px;
-    margin-bottom: 15px;
+    padding-bottom: 5px; /* Reduced padding */
+    margin-bottom: 10px; /* Reduced margin */
+    font-size: 1rem;
 }
 
 .bank-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 5px;
-    font-size: 0.95rem;
+    margin-bottom: 3px; /* More compact */
+    font-size: 0.85rem;
 }
 
 .bank-row label {
@@ -426,13 +459,13 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 5px 0;
-    font-size: 1rem;
+    padding: 3px 0; /* Reduced padding */
+    font-size: 0.9rem;
 }
 
 .tax-row label {
     font-weight: 500;
-    min-width: 180px;
+    min-width: 150px;
 }
 
 .tax-row span {
@@ -442,18 +475,15 @@ body {
 }
 
 .tax-rate {
-    width: 50px;
-    padding: 4px;
-    text-align: center;
-    border: 1px solid var(--border-light);
-    border-radius: 3px;
-    margin-right: 5px;
+    width: 40px; /* Smaller input for tax rate */
+    padding: 2px;
+    font-size: 0.85rem;
 }
 
 .tax-row.total {
     border-top: 2px solid var(--primary-color);
-    margin-top: 10px;
-    padding-top: 10px;
+    margin-top: 5px; /* Reduced margin */
+    padding-top: 5px; /* Reduced padding */
     font-size: 1.1rem;
     font-weight: 700;
 }
@@ -471,14 +501,14 @@ body {
     font-size: 0.95rem;
 }
 
-/* --- SIGNATURE SECTION --- */
+/* --- SIGNATURE SECTION (Compacted) --- */
 .signature-section {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    margin-top: 40px;
+    margin-top: 30px; /* Reduced margin */
     border-top: 1px solid var(--border-light);
-    padding-top: 20px;
+    padding-top: 15px; /* Reduced padding */
 }
 
 .declaration {
@@ -499,7 +529,7 @@ body {
 .signature-line {
     border-top: 1px solid var(--text-dark);
     padding-top: 5px;
-    margin-top: 40px;
+    margin-top: 30px; /* Reduced margin */
     font-size: 0.9rem;
     font-weight: 600;
 }
@@ -510,7 +540,7 @@ body {
     color: var(--secondary-color);
 }
 
-/* --- FOOTER STYLES (Provided for completeness, but keep it outside .invoice-container) --- */
+/* --- FOOTER STYLES (Kept for completeness) --- */
 .footer {
     background-color: var(--text-dark);
     color: var(--bg-white);
@@ -607,4 +637,225 @@ body {
 .developer-links a {
     margin-left: 10px;
     font-size: 1rem;
+}
+
+
+/* --- PRINT/PDF OPTIMIZATION (Kept for better PDF results) --- */
+@media print {
+
+    /* 1. Reset main layout for print */
+    body {
+        background-color: white !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+
+    .container {
+        display: block;
+    }
+
+    /* 2. Hide the sidebar (controls) in print */
+    .controls {
+        display: none !important;
+    }
+
+    /* 3. Optimize Invoice Container for Print Page */
+    .invoice-container {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 10px !important; /* Minimal padding */
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    /* 4. Increase Table Density to fit more products */
+    #productTable thead th {
+        padding: 6px 5px !important; 
+        font-size: 0.8rem !important;
+    }
+
+    #productTable tbody td {
+        padding: 3px !important; /* Very compact cells */
+        font-size: 0.75rem !important;
+    }
+
+    #productTable input[type="text"],
+    #productTable input[type="number"] {
+        padding: 2px !important;
+        font-size: 0.75rem !important;
+    }
+
+    .remove-row {
+        padding: 2px 5px !important;
+    }
+
+    /* 5. Compact Info Sections */
+    .billing-info {
+        padding: 5px !important; 
+        margin-bottom: 10px !important;
+    }
+
+    .bill-to h3 {
+        margin-bottom: 5px !important;
+        padding-bottom: 4px !important;
+        font-size: 0.9rem;
+    }
+
+    .form-group {
+        margin-bottom: 4px !important;
+    }
+
+    .form-group label {
+        font-size: 0.75rem !important;
+        min-width: 100px !important;
+    }
+
+    .form-group input,
+    .form-group select {
+        padding: 3px !important;
+        font-size: 0.75rem !important;
+    }
+
+    /* 6. Compact Calculations and Signatures */
+    .tax-row {
+        padding: 1px 0 !important;
+        font-size: 0.85rem !important;
+    }
+
+    .tax-row label {
+        min-width: 130px !important;
+    }
+
+    .tax-row.total {
+        margin-top: 4px !important;
+        padding-top: 4px !important;
+    }
+
+    .bank-row {
+        font-size: 0.8rem !important;
+    }
+
+    .signature-section {
+        margin-top: 15px !important;
+        padding-top: 8px !important;
+    }
+
+    .signature-line {
+        margin-top: 15px !important;
+    }
+}
+
+
+/* Invoice Suggestions Section */
+.invoice-suggestions {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.suggestion-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.suggestion-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.suggestion-item label {
+    font-weight: 600;
+    color: #333;
+    margin-right: 5px;
+}
+
+.suggestion-item span {
+    color: #007bff;
+    font-weight: 600;
+}
+
+.suggestion-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.suggestion-actions button {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.2s;
+}
+
+.suggestion-actions button:hover {
+    background: #eaeaea;
+}
+
+.financial-year-info small {
+    color: #555;
+    font-size: 12px;
+}
+
+/* Mobile View */
+@media (max-width: 600px) {
+    .suggestion-row {
+        flex-direction: column;
+        gap: 5px;
+    }
+    .suggestion-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    .suggestion-actions button {
+        width: 100%;
+    }
+}
+
+
+/* Mobile Responsive */
+@media (max-width: 1024px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .controls {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    
+    .content {
+        padding: 15px;
+    }
+    
+    .invoice-container {
+        max-width: 100%;
+        margin: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .invoice-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .invoice-title {
+        text-align: left;
+    }
+    
+    .billing-info {
+        flex-direction: column;
+    }
+    
+    .calculation-section {
+        flex-direction: column;
+    }
 }

@@ -2,7 +2,7 @@
 
 /* --- GENERAL STYLES AND VARIABLES (Must be consistent across all pages) --- */
 :root {
-    --primary-color: #007bff; /* Blue for primary actions/branding */
+    --primary-color: #343a40; /* Blue for primary actions/branding */
     --secondary-color: #6c757d; /* Gray for secondary elements */
     --success-color: #28a745; /* Green for success/save */
     --danger-color: #dc3545; /* Red for delete/danger */
@@ -55,7 +55,7 @@ body {
 
 .brand-name {
     display: block;
-    color: var(--primary-color);
+    color: var(--bg-white);
     font-size: 1.5rem;
     font-weight: 700;
     text-decoration: none;
@@ -65,7 +65,7 @@ body {
 .system-name {
     display: block;
     font-size: 0.8rem;
-    color: var(--secondary-color);
+    color: var(--bg-white);
     letter-spacing: 1px;
 }
 
@@ -96,11 +96,11 @@ body {
 .dashboard:hover,
 .view-history-btn:hover {
     background-color: rgba(255, 255, 255, 0.1);
-    color: var(--primary-color);
+    color: var(--bg-white);
 }
 
 .view-history-btn.active {
-    background-color: var(--primary-color);
+    background-color: var(--info-color);
     font-weight: 600;
     color: var(--bg-white);
 }
@@ -598,4 +598,411 @@ body {
     padding: 8px 15px; /* Smaller buttons */
     border-radius: 4px;
     font-size: 0.9rem;
+}/* Delete Confirmation Modal Styling */
+#deleteModal .modal-content {
+    background: #fff;
+    border-radius: 8px;
+    border-top: 4px solid #dc3545;
+    box-shadow: 0 10px 30px rgba(220, 53, 69, 0.2);
+    max-width: 450px;
+    margin: 50px auto;
+}
+
+#deleteModal .close {
+    color: #6c757d;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#deleteModal .close:hover {
+    color: #dc3545;
+}
+
+#deleteModal h3 {
+    color: #dc3545;
+    margin: 0 0 15px 0;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#deleteModal h3::before {
+    content: "⚠️";
+    font-size: 24px;
+}
+
+#deleteModal p {
+    color: #495057;
+    margin: 0 0 20px 0;
+    line-height: 1.5;
+}
+
+#deleteModal strong {
+    color: #dc3545;
+    background: #fff5f5;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid #f8d7da;
+}
+
+#deleteModal input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 16px;
+    margin: 10px 0;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+#deleteModal input:focus {
+    outline: none;
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+#deleteModal input.error {
+    border-color: #dc3545;
+    background: #fff5f5;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+#confirmDelete {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#confirmDelete:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+#confirmDelete:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+#cancelDelete {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#cancelDelete:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+/* Warning Info Box */
+.warning-info {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 6px;
+    padding: 12px;
+    margin: 15px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.warning-info i {
+    color: #856404;
+    font-size: 16px;
+    margin-top: 2px;
+}
+
+.warning-info p {
+    margin: 0;
+    color: #856404;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Success Message */
+.success-message {
+    background: #d1edff;
+    border: 1px solid #b3d9ff;
+    border-radius: 6px;
+    padding: 12px;
+    margin: 15px 0;
+    text-align: center;
+    color: #0066cc;
+    font-weight: 500;
+}
+/* Share Invoice Modal – Compact & Professional */
+.share-invoice-modal .modal-content {
+    max-width: 650px;
+    margin: 6% auto;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
+/* Header */
+.share-modal-header {
+    padding: 15px 20px;
+    background: #f4f6f9;
+    border-bottom: 1px solid #e1e4e8;
+    color: #333;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.share-modal-header h2 {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.close-share-modal {
+    background: none;
+    border: none;
+    color: #555;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Body */
+.share-modal-body {
+    padding: 20px;
+}
+
+/* Preview Box */
+.share-preview {
+    background: #fafafa;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.preview-header {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.preview-header h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: #333;
+}
+
+.preview-date {
+    font-size: 0.85rem;
+    padding: 3px 8px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.preview-customer {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.preview-customer p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #444;
+}
+
+/* Share Options */
+.share-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.share-option-card {
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 6px;
+    padding: 12px;
+    transition: 0.2s;
+}
+
+.share-option-card:hover {
+    background: #f7f9fc;
+    border-color: #007bff;
+}
+
+/* Icons */
+.option-header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.option-header i {
+    font-size: 1.6rem;
+    color: #4a90e2;
+}
+
+/* Text Info */
+.option-info h5 {
+    margin: 0 0 5px 0;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.option-info p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Features List */
+.option-features {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.option-features li {
+    font-size: 0.8rem;
+    color: #444;
+    margin-bottom: 6px;
+    display: flex;
+    gap: 6px;
+}
+
+.option-features i {
+    font-size: 0.7rem;
+    color: #4a90e2;
+}
+
+/* Buttons */
+.btn-share-option {
+    width: 100%;
+    padding: 8px;
+    background: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: 0.2s;
+}
+
+.btn-share-option:hover {
+    background: #3076c9;
+}
+
+/* Info Box */
+.share-info {
+    margin-top: 15px;
+    padding: 10px;
+    background: #eef6ff;
+    border: 1px solid #cfe2ff;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #1b6fc2;
+}
+
+.share-info i {
+    font-size: 1rem;
+}
+
+/* Toast */
+.success-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #4caf50;
+    padding: 12px 16px;
+    color: white;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .share-invoice-modal .modal-content {
+        width: 92%;
+    }
+
+    .share-options {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .share-modal-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .btn-share-option {
+        padding: 7px;
+    }
+}
+/* Mobile Responsive */
+@media (max-width: 1024px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .controls {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    
+    .content {
+        padding: 15px;
+    }
+    
+    .invoice-container {
+        max-width: 100%;
+        margin: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .invoice-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .invoice-title {
+        text-align: left;
+    }
+    
+    .billing-info {
+        flex-direction: column;
+    }
+    
+    .calculation-section {
+        flex-direction: column;
+    }
 }

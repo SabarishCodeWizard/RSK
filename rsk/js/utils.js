@@ -47,16 +47,16 @@ class Utils {
     }
 
     // Share complete invoice with professional formatting
-static async shareCompleteInvoice(invoice) {
-    const message = this.generateProfessionalInvoiceMessage(invoice);
-    const encodedMessage = encodeURIComponent(message);
-    const url = `https://wa.me/91${invoice.customerPhone}?text=${encodedMessage}`;
-    window.open(url, '_blank');
-}
+    static async shareCompleteInvoice(invoice) {
+        const message = this.generateProfessionalInvoiceMessage(invoice);
+        const encodedMessage = encodeURIComponent(message);
+        const url = `https://wa.me/91${invoice.customerPhone}?text=${encodedMessage}`;
+        window.open(url, '_blank');
+    }
 
-// Generate professional invoice message
-static generateProfessionalInvoiceMessage(invoice) {
-    return `📋 *TAX INVOICE - RSK ENTERPRISES*
+    // Generate professional invoice message
+    static generateProfessionalInvoiceMessage(invoice) {
+        return `📋 *TAX INVOICE - RSK ENTERPRISES*
 
 ┌──────────────────────────────
 │ *Invoice Details*
@@ -80,14 +80,14 @@ static generateProfessionalInvoiceMessage(invoice) {
 ┌──────────────────────────────
 │ *Product Details*
 ├──────────────────────────────
-${invoice.products.map(product => 
-    `│ ▫️ ${product.description}\n` +
-    `│   HSN: ${product.hsnCode || 'N/A'} | ` +
-    `Qty: ${product.qty} | ` +
-    `Rate: ₹${this.formatCurrency(product.rate)}\n` +
-    `│   Amount: ₹${this.formatCurrency(product.amount)}\n` +
-    `├──────────────────────────────`
-).join('\n')}
+${invoice.products.map(product =>
+            `│ ▫️ ${product.description}\n` +
+            `│   HSN: ${product.hsnCode || 'N/A'} | ` +
+            `Qty: ${product.qty} | ` +
+            `Rate: ₹${this.formatCurrency(product.rate)}\n` +
+            `│   Amount: ₹${this.formatCurrency(product.amount)}\n` +
+            `├──────────────────────────────`
+        ).join('\n')}
 
 ┌──────────────────────────────
 │ *Tax Calculation*
@@ -114,20 +114,20 @@ ${invoice.igstRate > 0 ? `│ IGST (${invoice.igstRate}%):     ₹${this.formatC
 📍 Address: 76(3) Padmavathipuram, Angeripalayam Road, Tirupur 641-602
 
 Thank you for your business! 🙏`;
-}
+    }
 
-// Generate simple mobile-friendly format
-static generateSimpleInvoiceMessage(invoice) {
-    return `*Invoice #${invoice.invoiceNumber}*
+    // Generate simple mobile-friendly format
+    static generateSimpleInvoiceMessage(invoice) {
+        return `*Invoice #${invoice.invoiceNumber}*
 
 *Customer:* ${invoice.customerName}
 *Date:* ${this.formatDate(invoice.date)}
 *Phone:* ${invoice.customerPhone}
 
 *Products:*
-${invoice.products.map(product => 
-    `• ${product.description} - ${product.qty} x ₹${this.formatCurrency(product.rate)} = ₹${this.formatCurrency(product.amount)}`
-).join('\n')}
+${invoice.products.map(product =>
+            `• ${product.description} - ${product.qty} x ₹${this.formatCurrency(product.rate)} = ₹${this.formatCurrency(product.amount)}`
+        ).join('\n')}
 
 *Total: ₹${this.formatCurrency(invoice.grandTotal)}*
 
@@ -137,12 +137,56 @@ Tirupur 641-602
 Phone: 8608127349
 
 Thank you!`;
-}
+    }
 
-// Keep the existing share function for backward compatibility
-static shareOnWhatsApp(phone, message) {
-    const encodedMessage = encodeURIComponent(message);
-    const url = `https://wa.me/91${phone}?text=${encodedMessage}`;
-    window.open(url, '_blank');
-}
+    // Keep the existing share function for backward compatibility
+    static shareOnWhatsApp(phone, message) {
+        const encodedMessage = encodeURIComponent(message);
+        const url = `https://wa.me/91${phone}?text=${encodedMessage}`;
+        window.open(url, '_blank');
+    }
+
+
+    // Financial year utilities
+    static getCurrentFinancialYear() {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1; // January is 0
+
+        // Financial year runs from April to March
+        if (currentMonth >= 4) { // April to December
+            return {
+                start: `${currentYear}-04-01`,
+                end: `${currentYear + 1}-03-31`,
+                display: `${currentYear}-${(currentYear + 1).toString().slice(2)}`
+            };
+        } else { // January to March
+            return {
+                start: `${currentYear - 1}-04-01`,
+                end: `${currentYear}-03-31`,
+                display: `${currentYear - 1}-${currentYear.toString().slice(2)}`
+            };
+        }
+    }
+
+    static isDateInFinancialYear(date, financialYear) {
+        const invoiceDate = new Date(date);
+        const startDate = new Date(financialYear.start);
+        const endDate = new Date(financialYear.end);
+
+        return invoiceDate >= startDate && invoiceDate <= endDate;
+    }
+
+    static parseInvoiceNumber(invoiceNumber) {
+        // Handle invoice numbers like "001", "015", etc.
+        const match = invoiceNumber.match(/^(\d+)$/);
+        if (match) {
+            return parseInt(match[1], 10);
+        }
+        return 0;
+    }
+
+    static formatInvoiceNumber(number) {
+        return number.toString().padStart(3, '0');
+    }
 }

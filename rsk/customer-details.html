@@ -60,7 +60,7 @@
             <form id="customerForm">
                 <div class="form-group">
                     <label for="modalCustomerPhone">Phone Number *</label>
-                    <input type="text" id="modalCustomerPhone" required>
+                    <input type="text" id="modalCustomerPhone" required maxlength="10">
                 </div>
                 <div class="form-group">
                     <label for="modalCustomerName">Name *</label>
@@ -79,6 +79,70 @@
                     <button type="button" id="cancelCustomer">Cancel</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="confirmation-modal success-modal">
+        <div class="confirmation-modal-content">
+            <div class="modal-header">
+                <i class="fas fa-check-circle fa-lg"></i>
+                <h3 id="successModalTitle">Success</h3>
+            </div>
+            <div class="modal-body">
+                <p class="modal-message" id="successModalMessage">Customer saved successfully!</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-confirm" id="successModalOk">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="confirmation-modal delete-modal">
+        <div class="confirmation-modal-content">
+            <div class="modal-header">
+                <i class="fas fa-trash-alt fa-lg"></i>
+                <h3>Delete Customer</h3>
+            </div>
+            <div class="modal-body">
+                <p class="modal-message">Are you sure you want to delete this customer?</p>
+                
+                <div class="customer-info">
+                    <div class="info-row">
+                        <span class="info-label">Name:</span>
+                        <span class="info-value" id="deleteCustomerName">--</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Phone:</span>
+                        <span class="info-value" id="deleteCustomerPhone">--</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">GSTIN:</span>
+                        <span class="info-value" id="deleteCustomerGSTIN">--</span>
+                    </div>
+                </div>
+                
+                <div class="warning-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p class="warning-text">
+                        <strong>Warning:</strong> This action cannot be undone. All customer data will be permanently deleted.
+                    </p>
+                </div>
+                
+                <div class="confirmation-section">
+                    <p class="confirmation-instruction">Type "DELETE" to confirm deletion:</p>
+                    <input type="text" id="deleteConfirmInput" class="confirmation-input" placeholder="Type DELETE to confirm">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-cancel" id="cancelDelete">Cancel</button>
+                <button class="modal-btn modal-btn-confirm" id="confirmDelete" disabled>
+                    <i class="fas fa-trash-alt"></i> Delete Customer
+                </button>
+            </div>
         </div>
     </div>
 

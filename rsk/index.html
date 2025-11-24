@@ -71,6 +71,33 @@
                         <p>TIRUPUR 641-602. CELL NO: 8608127349</p>
                         <p>GSTIN: 33EQEPR2516A1ZB</p>
                     </div>
+
+                     <!-- Add this after the calculation-section div and before the bank-details div -->
+                    <div class="invoice-suggestions">
+                        <div class="suggestion-content">
+                            <div class="suggestion-row">
+                                <div class="suggestion-item">
+                                    <label>Last Invoice Number:</label>
+                                    <span id="lastInvoiceNumber">--</span>
+                                </div>
+                                <div class="suggestion-item">
+                                    <label>Next Suggested Number:</label>
+                                    <span id="nextInvoiceNumber">--</span>
+                                </div>
+                            </div>
+                            <div class="suggestion-actions">
+                                <button type="button" id="applySuggestion">
+                                    <i class="fas fa-magic"></i> Apply Suggestion
+                                </button>
+                                <button type="button" id="refreshSuggestions">
+                                    <i class="fas fa-sync-alt"></i> Refresh
+                                </button>
+                            </div>
+                            <div class="financial-year-info">
+                                <small>Financial Year: <span id="currentFinancialYear">--</span></small>
+                            </div>
+                        </div>
+                    </div>
                     <div class="invoice-title">
                         <h2>Tax Invoice</h2>
                         <div class="invoice-number">
@@ -88,7 +115,6 @@
                     <div class="bill-to">
                         <h3>Bill to Party</h3>
                         <div class="form-group">
-                            <label for="customerPhone">Phone Number:</label>
                             <input type="text" id="customerPhone" placeholder="e.g. 9876543210" maxlength="10">
                         </div>
                         <div class="form-group">
@@ -206,6 +232,8 @@
                             <span id="amountInWords">Zero rupees only</span>
                         </div>
                     </div>
+
+                   
 
                     <div class="bank-details">
                         <h3>Bank Details</h3>

@@ -1,7 +1,15 @@
+// Add these variables at the top of your script.js
+let currentFinancialYear = null;
+let invoiceSuggestions = null;
+
+
 // script.js - Main application logic for index.html
 document.addEventListener('DOMContentLoaded', async function () {
     // Initialize database
     await invoiceDB.init();
+
+    // Initialize invoice suggestions
+    await initializeInvoiceSuggestions();
 
     // Set current date
     const today = new Date().toISOString().split('T')[0];
@@ -11,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Check if we're editing an existing invoice
     const urlParams = new URLSearchParams(window.location.search);
     const editInvoiceId = urlParams.get('edit');
-    
+
     if (editInvoiceId) {
         await loadInvoiceForEdit(editInvoiceId);
     } else {
@@ -132,10 +140,80 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 });
 
+
+
+// Add these new functions
+async function initializeInvoiceSuggestions() {
+    currentFinancialYear = Utils.getCurrentFinancialYear();
+    await loadInvoiceSuggestions();
+
+    // Update financial year display
+    document.getElementById('currentFinancialYear').textContent = currentFinancialYear.display;
+}
+
+
+async function loadInvoiceSuggestions() {
+    const invoices = await invoiceDB.getAllInvoices();
+    const currentYearInvoices = invoices.filter(invoice =>
+        Utils.isDateInFinancialYear(invoice.date, currentFinancialYear)
+    );
+
+    // Get the highest invoice number for current financial year
+    let lastInvoiceNumber = 0;
+
+    currentYearInvoices.forEach(invoice => {
+        const invoiceNum = Utils.parseInvoiceNumber(invoice.invoiceNumber);
+        if (invoiceNum > lastInvoiceNumber) {
+            lastInvoiceNumber = invoiceNum;
+        }
+    });
+
+    invoiceSuggestions = {
+        lastInvoice: lastInvoiceNumber,
+        nextInvoice: lastInvoiceNumber + 1
+    };
+
+    updateSuggestionDisplay();
+}
+
+
+function updateSuggestionDisplay() {
+    if (invoiceSuggestions) {
+        const lastDisplay = invoiceSuggestions.lastInvoice > 0
+            ? Utils.formatInvoiceNumber(invoiceSuggestions.lastInvoice)
+            : 'No invoices yet';
+
+        const nextDisplay = Utils.formatInvoiceNumber(invoiceSuggestions.nextInvoice);
+
+        document.getElementById('lastInvoiceNumber').textContent = lastDisplay;
+        document.getElementById('nextInvoiceNumber').textContent = nextDisplay;
+    }
+}
+
+
+
+function applyInvoiceSuggestion() {
+    if (invoiceSuggestions) {
+        const suggestedNumber = Utils.formatInvoiceNumber(invoiceSuggestions.nextInvoice);
+        document.getElementById('invoiceNo').value = suggestedNumber;
+
+        // Show confirmation
+        const suggestionElement = document.getElementById('nextInvoiceNumber');
+        const originalText = suggestionElement.textContent;
+        suggestionElement.textContent = 'Applied!';
+        suggestionElement.style.color = '#27ae60';
+
+        setTimeout(() => {
+            suggestionElement.textContent = originalText;
+            suggestionElement.style.color = '#e74c3c';
+        }, 2000);
+    }
+}
+
 async function loadInvoiceForEdit(invoiceId) {
     try {
         const invoice = await invoiceDB.getInvoice(parseInt(invoiceId));
-        
+
         if (invoice) {
             // Fill basic invoice details
             document.getElementById('invoiceNo').value = invoice.invoiceNumber;
@@ -151,31 +229,31 @@ async function loadInvoiceForEdit(invoiceId) {
             document.getElementById('supplyDate').value = invoice.supplyDate;
             document.getElementById('placeOfSupply').value = invoice.placeOfSupply;
             document.getElementById('reverseCharge').value = invoice.reverseCharge;
-            
+
             // Fill tax rates
             document.getElementById('cgstRate').value = invoice.cgstRate;
             document.getElementById('sgstRate').value = invoice.sgstRate;
             document.getElementById('igstRate').value = invoice.igstRate;
-            
+
             // Clear existing rows
             document.getElementById('productTableBody').innerHTML = '';
-            
+
             // Add product rows
             invoice.products.forEach((product, index) => {
                 addProductRow();
                 const rows = document.querySelectorAll('#productTableBody tr');
                 const currentRow = rows[rows.length - 1];
-                
+
                 currentRow.querySelector('.product-description').value = product.description;
                 currentRow.querySelector('.hsn-code').value = product.hsnCode;
                 currentRow.querySelector('.qty').value = product.qty;
                 currentRow.querySelector('.rate').value = product.rate;
-                
+
                 calculateRowAmount(currentRow);
             });
-            
+
             calculateTotals();
-            
+
             // Update button text for edit mode
             document.getElementById('saveBill').innerHTML = '<i class="fas fa-save"></i> Update Bill';
         }
@@ -256,9 +334,9 @@ function calculateTotals() {
 async function saveBill() {
     const urlParams = new URLSearchParams(window.location.search);
     const editInvoiceId = urlParams.get('edit');
-    
+
     const invoiceData = collectInvoiceData();
-    
+
     // If editing, preserve the original ID
     if (editInvoiceId) {
         invoiceData.id = parseInt(editInvoiceId);
@@ -266,13 +344,13 @@ async function saveBill() {
 
     try {
         await invoiceDB.saveInvoice(invoiceData);
-        
+
         if (editInvoiceId) {
             alert('Bill updated successfully!');
         } else {
             alert('Bill saved successfully!');
         }
-        
+
         // Redirect to history page after save
         window.location.href = 'invoice-history.html';
     } catch (error) {
@@ -326,14 +404,14 @@ function collectInvoiceData() {
     };
 }
 
-function resetForm() {
+async function resetForm() {
     if (confirm('Are you sure you want to reset the form? All unsaved data will be lost.')) {
         document.querySelectorAll('input').forEach(input => {
             if (input.type !== 'button' && input.type !== 'submit') {
                 input.value = '';
             }
         });
-
+        await initializeInvoiceSuggestions();
         document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
         document.getElementById('supplyDate').value = new Date().toISOString().split('T')[0];
         document.getElementById('cgstRate').value = 9;
@@ -352,10 +430,113 @@ function resetForm() {
 
         // Reset button text if it was in edit mode
         document.getElementById('saveBill').innerHTML = '<i class="fas fa-save"></i> Save BILL';
-        
+
         // Remove edit parameter from URL
         if (window.location.search.includes('edit')) {
             window.history.replaceState({}, document.title, window.location.pathname);
         }
     }
 }
+
+
+// Add these new functions
+async function initializeInvoiceSuggestions() {
+    currentFinancialYear = Utils.getCurrentFinancialYear();
+    await loadInvoiceSuggestions();
+
+    // Update financial year display
+    document.getElementById('currentFinancialYear').textContent = currentFinancialYear.display;
+}
+
+async function loadInvoiceSuggestions() {
+    const invoices = await invoiceDB.getAllInvoices();
+    const currentYearInvoices = invoices.filter(invoice =>
+        Utils.isDateInFinancialYear(invoice.date, currentFinancialYear)
+    );
+
+    // Get the highest invoice number for current financial year
+    let lastInvoiceNumber = 0;
+
+    currentYearInvoices.forEach(invoice => {
+        const invoiceNum = Utils.parseInvoiceNumber(invoice.invoiceNumber);
+        if (invoiceNum > lastInvoiceNumber) {
+            lastInvoiceNumber = invoiceNum;
+        }
+    });
+
+    invoiceSuggestions = {
+        lastInvoice: lastInvoiceNumber,
+        nextInvoice: lastInvoiceNumber + 1
+    };
+
+    updateSuggestionDisplay();
+}
+
+function updateSuggestionDisplay() {
+    if (invoiceSuggestions) {
+        const lastDisplay = invoiceSuggestions.lastInvoice > 0
+            ? Utils.formatInvoiceNumber(invoiceSuggestions.lastInvoice)
+            : 'No invoices yet';
+
+        const nextDisplay = Utils.formatInvoiceNumber(invoiceSuggestions.nextInvoice);
+
+        document.getElementById('lastInvoiceNumber').textContent = lastDisplay;
+        document.getElementById('nextInvoiceNumber').textContent = nextDisplay;
+    }
+}
+
+function applyInvoiceSuggestion() {
+    if (invoiceSuggestions) {
+        const suggestedNumber = Utils.formatInvoiceNumber(invoiceSuggestions.nextInvoice);
+        document.getElementById('invoiceNo').value = suggestedNumber;
+
+        // Show confirmation
+        const suggestionElement = document.getElementById('nextInvoiceNumber');
+        const originalText = suggestionElement.textContent;
+        suggestionElement.textContent = 'Applied!';
+        suggestionElement.style.color = '#27ae60';
+
+        setTimeout(() => {
+            suggestionElement.textContent = originalText;
+            suggestionElement.style.color = '#e74c3c';
+        }, 2000);
+    }
+}
+
+// Add event listeners for the new buttons
+document.addEventListener('DOMContentLoaded', function () {
+    // ... your existing event listeners ...
+
+    // Add these new event listeners
+    document.getElementById('applySuggestion').addEventListener('click', function () {
+        applyInvoiceSuggestion();
+    });
+
+    document.getElementById('refreshSuggestions').addEventListener('click', async function () {
+        await loadInvoiceSuggestions();
+
+        // Show refresh confirmation
+        const refreshBtn = this;
+        const originalHtml = refreshBtn.innerHTML;
+        refreshBtn.innerHTML = '<i class="fas fa-check"></i> Refreshed!';
+        refreshBtn.style.background = '#27ae60';
+
+        setTimeout(() => {
+            refreshBtn.innerHTML = originalHtml;
+            refreshBtn.style.background = '';
+        }, 2000);
+    });
+
+    // Auto-refresh suggestions when invoice date changes
+    document.getElementById('invoiceDate').addEventListener('change', async function () {
+        const selectedDate = this.value;
+        const financialYear = Utils.getCurrentFinancialYear();
+
+        // Check if the selected date is in current financial year
+        if (!Utils.isDateInFinancialYear(selectedDate, financialYear)) {
+            alert(`Note: Selected date is not in current financial year (${financialYear.display}). Invoice numbers are recycled within the financial year.`);
+        }
+
+        await loadInvoiceSuggestions();
+    });
+});
